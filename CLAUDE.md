@@ -21,7 +21,7 @@ Built with the `analytics-final-project` skill. Simulated data only.
 | 1 | Repo, environment, data generator (one import per minute) | A new file lands every minute and its name is logged | done |
 | 2 | ETL loop: detect, hash, land in TinyDB, run log, SQL logging | A duplicate file is skipped and shown in the log | done |
 | 3 | Expert models: MoE router, Jev classification, Claude extraction, review queue, gold set | 50 hand-labeled records scored; model usage logged | **current** — built and scored; waiting on the instructor's review of `gold_set.csv` labels |
-| 4 | Clean into SQLite + Snowflake, statistics, forecast, trigger and action | The trigger fires on a seeded anomaly in a test | |
+| 4 | Clean into SQLite + Snowflake, statistics, forecast, trigger and action | The trigger fires on a seeded anomaly in a test. Also: generator writes varied buyer notes (not just the fixed 11, so live runs make real model calls) and occasional injection notes, logged in `generator_log.csv` | |
 | 5 | Streamlit dashboard: live flow chart, step panels with SQL and formulas, MoE view | An import is held and released on screen with its file name, SQL and formula | |
 | 6 | Cloud: GitHub Actions pipeline, Streamlit Community Cloud, Claude Routine | The public app updates every minute during a demo run | |
 | 7 | Governance docs, prompt-injection test, 30-second Claude Motion overview, README, BINGO card | `scripts/check_bingo.py` passes on the README | |
