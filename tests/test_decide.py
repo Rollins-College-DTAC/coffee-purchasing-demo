@@ -30,6 +30,9 @@ def db(tmp_path, monkeypatch):
     return Database(tmp_path / "a.sqlite")
 
 
+STEADY = [5.0, 5.1, 4.9, 5.05, 4.95, 5.0, 5.1, 4.9, 5.0, 5.02, 4.98, 5.0] * 3  # 36 published imports
+
+
 def add_history(db, means):
     for i, m in enumerate(means):
         db.conn.execute("INSERT INTO imports VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -114,7 +117,7 @@ def test_z_score_and_forecast_shapes():
 # ---------- Decide and Act ----------
 
 def test_seeded_spike_fires_trigger_holds_and_opens_incident(db, en):
-    add_history(db, [5.0, 5.1, 4.9, 5.05, 4.95, 5.0, 5.1, 4.9, 5.0, 5.02, 4.98, 5.0])
+    add_history(db, STEADY)
     imp = pending(db, "run-spike", 8.0)
     assert decide_import(db, imp, en) == "held"
 
@@ -130,7 +133,7 @@ def test_seeded_spike_fires_trigger_holds_and_opens_incident(db, en):
 
 
 def test_normal_import_is_published(db, en):
-    add_history(db, [5.0, 5.1, 4.9, 5.05, 4.95, 5.0, 5.1, 4.9, 5.0, 5.02, 4.98, 5.0])
+    add_history(db, STEADY)
     assert decide_import(db, pending(db, "run-ok", 5.03), en) == "published"
     assert rows(db, "SELECT fired FROM decision_log")[0]["fired"] == 0
     assert rows(db, "SELECT COUNT(*) n FROM incident_log")[0]["n"] == 0
@@ -158,7 +161,7 @@ def test_statistics_log_cis_and_forecast(db, en):
 
 @pytest.mark.parametrize("release, status", [(True, "released"), (False, "rejected")])
 def test_person_releases_or_rejects_a_held_import(db, en, release, status):
-    add_history(db, [5.0, 5.1, 4.9, 5.05, 4.95, 5.0, 5.1, 4.9, 5.0, 5.02, 4.98, 5.0])
+    add_history(db, STEADY)
     decide_import(db, pending(db, "run-spike", 8.0), en)
     assert review_decide(db, "run-spike", release, "Test Buyer") == status
     assert rows(db, "SELECT status, decided_by FROM imports WHERE run_id = 'run-spike'")[0] == \

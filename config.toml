@@ -38,7 +38,8 @@ output = 10.00
 [trigger]
 z_threshold = 3.0          # |z| above this -> hold the import for a person
 window = 60                # compare with the last N published imports
-min_history = 10           # publish without testing until this many imports exist
+min_history = 30           # publish without testing until this many imports exist (10 gave early false
+                           # alarms: a tight first few imports make s too small; see docs/ in Milestone 7)
 
 # Gold-set pass bar, fixed before any model was scored
 [gold]
