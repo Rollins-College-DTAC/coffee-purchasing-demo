@@ -11,5 +11,8 @@ pages = [
     st.Page("dashboard/pages/live.py", title="Live run", icon="🔴", default=True),
     st.Page("dashboard/pages/models.py", title="Models (MoE)", icon="🧠"),
     st.Page("dashboard/pages/analytics.py", title="Analytics", icon="📈"),
+    st.Page("dashboard/pages/data.py", title="Data", icon="🗂️"),
+    st.Page("dashboard/pages/history.py", title="Pipeline history", icon="🕒"),
+    st.Page("dashboard/pages/governance.py", title="Governance", icon="🛡️"),
 ]
 st.navigation(pages).run()

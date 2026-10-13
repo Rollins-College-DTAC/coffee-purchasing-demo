@@ -25,21 +25,18 @@ def source():
     return SNAPSHOT, "snapshot"
 
 
-def connect():
-    path, _ = source()
-    con = sqlite3.connect(f"file:{path}?mode=ro", uri=True, check_same_thread=False)
-    con.row_factory = sqlite3.Row
-    return con
-
-
 @st.cache_data(ttl=3, show_spinner=False)
-def query(sql, params=()):
-    """Run a read-only query and return a DataFrame. Cached 3 s so live pages stay fresh."""
-    con = connect()
+def _query(path, sql, params):
+    con = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
     try:
         return pd.read_sql_query(sql, con, params=params)
     finally:
         con.close()
+
+
+def query(sql, params=()):
+    """Run a read-only query and return a DataFrame. Cached 3 s (per database) so live pages stay fresh."""
+    return _query(str(source()[0]), sql, tuple(params))
 
 
 def md(text):
