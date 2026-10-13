@@ -76,7 +76,7 @@ GitHub: https://github.com/Rollins-College-DTAC/coffee-purchasing-demo
 - `dashboard/data.py` reads read-only from `DASHBOARD_DB`, else `data/analytics.sqlite` (live), else the committed snapshot `demo/analytics.sqlite` (what Streamlit Cloud shows until Milestone 6). Escape `$` with `md()` before `st.markdown`.
 - Live run: held-import banner with Release/Reject (local only; calls `agent.review.decide`), Graphviz flow chart in `st.fragment(run_every=5)` built by `dashboard/flow.py` (two rows), one expander per `run_log` step with SQL, params, formulas.
 - Refresh the snapshot: `sqlite3 data/analytics.sqlite ".backup demo/analytics.sqlite"`, then `PRAGMA journal_mode=DELETE; DELETE FROM model_cache; VACUUM;`.
-- Streamlit Cloud installs from `uv.lock` (checked before requirements.txt); set Python 3.12 in the app's advanced settings. As of 2026-10-13 the app URL returns "no access or does not exist" (repo is private).
+- Streamlit Cloud installs from `uv.lock` (checked before requirements.txt); set Python 3.12 in the app's advanced settings. Deployed app: https://appapppy-xrrj3w9rxfwa7dgpyvpch5.streamlit.app/ (serves the snapshot; verified 2026-10-13).
 - `tests/test_dashboard.py` renders every page with `AppTest` on a copy of the snapshot and clicks Release.
 
 ## Rules
