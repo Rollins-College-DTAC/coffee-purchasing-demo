@@ -1,0 +1,61 @@
+# Runs the agent once a minute inside one job and publishes state to the `data` branch,
+# which the Streamlit app reads. Start it from the Actions tab: "pipeline" -> Run workflow.
+name: pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "How many minutes to run (one import per minute)"
+        required: true
+        default: "15"
+      backfill:
+        description: "Past imports to write first (use 40 on the very first run so statistics have history)"
+        required: true
+        default: "0"
+  # Optional: one short run each hour between demos.
+  # schedule:
+  #   - cron: "0 * * * *"
+
+permissions:
+  contents: write   # push the data branch with GITHUB_TOKEN (does not start other workflows)
+  issues: write     # read and close review requests from the Streamlit app
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false   # never let two runs write the data branch at once
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
+      TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MINUTES: ${{ inputs.minutes || '1' }}
+      BACKFILL: ${{ inputs.backfill || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git for commits
+        run: |
+          git config --global user.name "pipeline-bot"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check out the data branch into state/
+        run: |
+          if git fetch origin data:data 2>/dev/null; then
+            git worktree add state data
+          else
+            git worktree add --orphan -b data state
+          fi
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run the agent
+        run: uv run python -m agent.cloud_loop --minutes "$MINUTES" --backfill "$BACKFILL" --state state/
