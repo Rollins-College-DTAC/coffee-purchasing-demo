@@ -9,5 +9,6 @@ st.set_page_config(page_title="Raw Coffee Purchasing", page_icon="☕", layout="
 
 pages = [
     st.Page("dashboard/pages/live.py", title="Live run", icon="🔴", default=True),
+    st.Page("dashboard/pages/models.py", title="Models (MoE)", icon="🧠"),
 ]
 st.navigation(pages).run()
