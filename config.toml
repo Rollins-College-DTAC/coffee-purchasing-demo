@@ -1,0 +1,40 @@
+# Agent settings. Model names change: edit them here, never in code.
+
+[models]
+jev = "jev-1.13.0"                 # pinned: thresholds below were set against this version
+extract = "claude-haiku-5-5"       # first try for extraction (and classify fallback)
+extract_effort = "low"             # short structured answers; keeps thinking tokens small
+escalate = "claude-sonnet-5-5"     # re-extract hard records; explain held imports
+
+[prompts]
+jev_questions = "jev_questions_v1.json"
+extract = "extract_v1.md"
+
+[thresholds]
+review_confidence = 0.6    # Jev category confidence below this -> review queue
+injection = 0.5            # Jev injection probability at or above this -> quarantine
+
+[budget]
+kill_switch = false        # true (or env KILL_SWITCH=1) sends every task to rules
+daily_usd = 1.00           # estimated model spend per UTC day; over it -> rules + incident
+extract_max_tokens = 600
+escalate_max_tokens = 4000
+
+# USD per million tokens, used for estimated_cost_usd in model_usage_log
+[pricing.jev]
+input = 0.042
+output = 0.0
+
+[pricing.claude-haiku-5-5]
+input = 0.10
+output = 0.50
+
+[pricing.claude-sonnet-5-5]
+input = 2.00
+output = 10.00
+
+# Gold-set pass bar, fixed before any model was scored
+[gold]
+category_accuracy = 0.90
+injection_recall = 1.0
+invented_values = 0

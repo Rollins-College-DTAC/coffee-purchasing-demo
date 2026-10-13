@@ -33,6 +33,23 @@ CREATE TABLE IF NOT EXISTS incident_log (
   incident_id TEXT, run_id TEXT, kind TEXT, detail TEXT, status TEXT,
   decided_by TEXT, opened_at TEXT, closed_at TEXT
 );
+CREATE TABLE IF NOT EXISTS model_cache (
+  input_hash TEXT PRIMARY KEY, task TEXT, expert TEXT, model TEXT, prompt_version TEXT,
+  route_reason TEXT, output_json TEXT, confidence REAL, created_at TEXT
+);
+CREATE TABLE IF NOT EXISTS record_enrichment (
+  run_id TEXT, file_name TEXT, lot_id TEXT, note TEXT,
+  category TEXT, category_confidence REAL, urgency REAL, urgency_confidence REAL, injection_p REAL,
+  classify_expert TEXT, classify_call_id TEXT,
+  extract_json TEXT, extract_expert TEXT, extract_call_id TEXT,
+  status TEXT,             -- ok, review, quarantined
+  enriched_at TEXT
+);
+CREATE TABLE IF NOT EXISTS review_queue (
+  review_id TEXT, run_id TEXT, file_name TEXT, lot_id TEXT, reason TEXT, detail TEXT,
+  status TEXT,             -- open, accepted, corrected
+  decided_by TEXT, opened_at TEXT, closed_at TEXT
+);
 """
 
 MAX_PARAM_CHARS = 80

@@ -12,17 +12,22 @@ from tinydb import TinyDB
 
 from agent import settings
 from agent.db import Database
+from agent.enrich import Enricher, enrich_file
 from agent.etl import process_file
 
 SCAN_SECONDS = 15
 
 
-def scan(db, raw):
+def scan(db, raw, enricher=None):
     if not settings.INBOX.exists():
         return
     # Dot files are the generator's half-written temp files (and .gitkeep)
     for path in sorted(p for p in settings.INBOX.iterdir() if p.is_file() and not p.name.startswith(".")):
         status = process_file(path, db, raw, settings.OUT)
+        if status == "landed" and enricher:
+            rows = enrich_file(db, raw, enricher)
+            counts = {s: sum(r["status"] == s for r in rows) for s in ("ok", "review", "quarantined")}
+            status += f", enriched ({counts['ok']} ok, {counts['review']} review, {counts['quarantined']} quarantined)"
         print(f"[agent] {db.run_id} {path.name}: {status}", flush=True)
 
 
@@ -33,13 +38,14 @@ def main():
 
     db = Database(settings.SQLITE_PATH)
     raw = TinyDB(settings.RAW_PATH)
+    enricher = Enricher(db)
 
     if args.once:
-        scan(db, raw)
+        scan(db, raw, enricher)
         return
 
     scheduler = BlockingScheduler()
-    scheduler.add_job(scan, "interval", seconds=SCAN_SECONDS, args=[db, raw],
+    scheduler.add_job(scan, "interval", seconds=SCAN_SECONDS, args=[db, raw, enricher],
                       max_instances=1, next_run_time=datetime.now())
     print(f"[agent] watching {settings.INBOX} every {SCAN_SECONDS}s (Ctrl+C to stop)", flush=True)
     try:
