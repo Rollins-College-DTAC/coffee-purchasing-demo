@@ -9,6 +9,7 @@ escalate = "claude-sonnet-5-5"     # re-extract hard records; explain held impor
 [prompts]
 jev_questions = "jev_questions_v1.json"
 extract = "extract_v1.md"
+explain = "explain_v2.md"
 
 [thresholds]
 review_confidence = 0.6    # Jev category confidence below this -> review queue
@@ -32,6 +33,12 @@ output = 0.50
 [pricing.claude-sonnet-5-5]
 input = 2.00
 output = 10.00
+
+# Decide step: anomaly rule on each import's mean $/lb
+[trigger]
+z_threshold = 3.0          # |z| above this -> hold the import for a person
+window = 60                # compare with the last N published imports
+min_history = 10           # publish without testing until this many imports exist
 
 # Gold-set pass bar, fixed before any model was scored
 [gold]

@@ -50,6 +50,33 @@ CREATE TABLE IF NOT EXISTS review_queue (
   status TEXT,             -- open, accepted, corrected
   decided_by TEXT, opened_at TEXT, closed_at TEXT
 );
+
+-- Silver: typed, validated purchase lots (one row per lot)
+CREATE TABLE IF NOT EXISTS purchases (
+  run_id TEXT, file_name TEXT, lot_id TEXT, origin TEXT, supplier TEXT,
+  quantity_lbs REAL, price_per_lb REAL, cupping_score REAL, harvest_date TEXT,
+  note TEXT, category TEXT, urgency REAL,
+  freight_premium_usd_per_lb REAL, discount_pct REAL, delay_weeks REAL,
+  enrichment_status TEXT, loaded_at TEXT,
+  PRIMARY KEY (run_id, lot_id)
+);
+-- One row per import: its forecast measure and what the Decide step did with it
+CREATE TABLE IF NOT EXISTS imports (
+  run_id TEXT PRIMARY KEY, file_name TEXT, n_lots INTEGER, mean_price_per_lb REAL,
+  status TEXT,             -- pending, published, held, released, rejected
+  loaded_at TEXT, decided_at TEXT, decided_by TEXT
+);
+
+-- Gold: only imports that were published, or released by a person
+CREATE VIEW IF NOT EXISTS gold_import_stats AS
+  SELECT run_id, file_name, n_lots, mean_price_per_lb, status, loaded_at
+  FROM imports WHERE status IN ('published', 'released');
+CREATE VIEW IF NOT EXISTS gold_purchases AS
+  SELECT p.* FROM purchases p JOIN gold_import_stats g USING (run_id);
+CREATE VIEW IF NOT EXISTS gold_origin_summary AS
+  SELECT origin, COUNT(*) AS lots, AVG(price_per_lb) AS avg_price_per_lb,
+         AVG(cupping_score) AS avg_cupping_score, SUM(quantity_lbs) AS total_lbs
+  FROM gold_purchases GROUP BY origin;
 """
 
 MAX_PARAM_CHARS = 80

@@ -150,6 +150,26 @@ CATEGORY_WORDS = [
 ]
 
 
+def claude_explain(facts, template, model, max_tokens):
+    """Plain-English explanation of a held import. Opts into server-side refusal fallback."""
+    r = claude_client().beta.messages.create(
+        model=model, max_tokens=max_tokens,
+        betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+        messages=[{"role": "user", "content": template.replace("{facts}", facts)}],
+    )
+    if r.stop_reason == "refusal":
+        raise ValueError("explanation refused")
+    text = "".join(b.text for b in r.content if b.type == "text").strip()
+    return Result(output={"text": text}, confidence=None, input_tokens=r.usage.input_tokens,
+                  output_tokens=r.usage.output_tokens, model=r.model)
+
+
+def rules_explain(facts):
+    first = facts.splitlines()[0] if facts else "This import"
+    return Result(output={"text": f"{first} A person should compare the lots with recent imports before releasing."},
+                  confidence=None)
+
+
 def rules_classify(note):
     """Keyword rules. Confidence is 1.0 only for an empty note; otherwise None (a guess)."""
     text = note.strip()

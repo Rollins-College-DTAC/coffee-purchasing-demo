@@ -56,7 +56,9 @@ class Enricher:
         self.db, self.cfg = db, config
         self.questions = experts.load_questions()
         self.extract_template = (settings.PROMPTS / config["prompts"]["extract"]).read_text()
-        self.versions = {"classify": config["prompts"]["jev_questions"], "extract": config["prompts"]["extract"]}
+        self.explain_template = (settings.PROMPTS / config["prompts"]["explain"]).read_text()
+        self.versions = {"classify": config["prompts"]["jev_questions"], "extract": config["prompts"]["extract"],
+                         "explain": config["prompts"]["explain"]}
         self.jev_available = bool(os.environ.get("TYPESAFE_API_KEY"))
         self.claude_available = bool(os.environ.get("ANTHROPIC_API_KEY"))
         self.spent = 0.0
@@ -132,6 +134,10 @@ class Enricher:
 
     def run_expert(self, task, expert, note):
         models, budget = self.cfg["models"], self.cfg["budget"]
+        if task == "explain":
+            if expert == "rules":
+                return experts.rules_explain(note)
+            return experts.claude_explain(note, self.explain_template, expert, budget["escalate_max_tokens"])
         if expert == "rules":
             return experts.rules_classify(note) if task == "classify" else experts.rules_extract(note)
         if task == "classify":

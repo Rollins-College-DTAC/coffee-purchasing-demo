@@ -73,3 +73,19 @@ def test_price_has_a_trend():
     rng = random.Random(7)
     means = [build_import(t, T0, rng, SUPPLIERS)[1] for t in range(150)]
     assert sum(means[-30:]) > sum(means[:30])
+
+
+def test_injection_lots_are_logged(tmp_path, monkeypatch):
+    import generator.generate as g
+    monkeypatch.setattr(g, "INJECTION_RATE", 1.0)
+    log = tmp_path / "generator_log.csv"
+    write_import(tmp_path, log, T0, random.Random(8), SUPPLIERS, anomaly=None, resend=False)
+    lots = read_log(log)[0]["injection_lots"].split(";")
+    assert lots and all(lot.startswith("LOT-0000-") for lot in lots)
+
+
+def test_notes_vary_so_live_runs_are_not_all_cache_hits():
+    rng = random.Random(9)
+    notes = [r.get("notes") or r.get("buyer_notes") for t in range(20)
+             for r in build_import(t, T0, rng, SUPPLIERS)[0]]
+    assert len(set(notes)) > 60

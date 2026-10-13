@@ -58,6 +58,17 @@ GitHub: https://github.com/Rollins-College-DTAC/coffee-purchasing-demo
 - Gold labels in `gold_set.csv` were written by Claude (claude-opus-5-5, `labeled_by` column) at the user's request, not by hand. Disclose this in the README's AI assistance section (Milestone 7). First Jev score (2026-10-13): category 0.92, urgency within-1 0.98, injection recall 1.0 (1 false alarm: G40), category Brier 0.106. Claude (`claude-haiku-5-5`, effort low) scored 2026-10-13: category 1.00, urgency within-1 1.00, injection recall 1.00, extraction field accuracy 0.98–1.00, 0 invented values. Caution: the labels were written by Claude, which may favor Claude; re-score after the hand review.
 - Tests mock `experts.*` with recorded Jev answers in `tests/fixtures/jev_recorded.json`; no live calls.
 
+## Pipeline notes (Milestone 4)
+
+- Loop order per file: detect → land → redact → classify → extract → load → decide → act → statistics → warehouse (each a `run_log` step).
+- `agent/clean.py::load_file` maps raw records to `purchases` (origin keywords, title-case supplier, lbs, $/lb, ISO date), drops in-file duplicate lots, skips quarantined records, rejects invalid ones (logged), and writes one `imports` row (`mean_price_per_lb`, status `pending`).
+- Gold views: `gold_import_stats`, `gold_purchases`, `gold_origin_summary` include only imports with status `published` or `released`.
+- `agent/decide.py`: z-score of the import mean vs the last 60 gold imports (`[trigger]` in `config.toml`: threshold 3, window 60, min_history 10). Held → `incident_log` (trigger), `review_queue` (`trigger_hold`) with an explanation from `claude-sonnet-5-5` (server-side refusal fallback on), else rules text. `run_statistics` logs 95% CIs by origin and, from 20 gold imports, the ETS forecast with prediction interval and a backtest vs naive.
+- A person releases or rejects: `uv run python -m agent.review list|release|reject <run_id> --by NAME`.
+- `agent/warehouse.py` syncs each run to Snowflake when all `SNOWFLAKE_*` are set; otherwise logs "skipped". Not yet tested live: no Snowflake account as of 2026-10-13.
+- Generator: `--backfill N` writes N past imports first; half the notes are templates with random numbers (real model calls); `injection_lots` column in `generator_log.csv`.
+- `uv run python -m scripts.score_trigger` reports trigger precision/recall against `generator_log.csv`.
+
 ## Rules
 
 - The Streamlit app entrypoint is `streamlit_app.py` at the repo root (Streamlit Community Cloud expects that name). The repo's default branch is `main`.

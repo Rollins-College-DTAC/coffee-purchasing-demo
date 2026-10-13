@@ -10,8 +10,10 @@ from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from tinydb import TinyDB
 
-from agent import settings
+from agent import settings, warehouse
+from agent.clean import load_file
 from agent.db import Database
+from agent.decide import decide_import, run_statistics
 from agent.enrich import Enricher, enrich_file
 from agent.etl import process_file
 
@@ -28,6 +30,10 @@ def scan(db, raw, enricher=None):
             rows = enrich_file(db, raw, enricher)
             counts = {s: sum(r["status"] == s for r in rows) for s in ("ok", "review", "quarantined")}
             status += f", enriched ({counts['ok']} ok, {counts['review']} review, {counts['quarantined']} quarantined)"
+            imp = load_file(db, raw)
+            status += f", {imp['n_lots']} lots loaded, {decide_import(db, imp, enricher)}"
+            run_statistics(db)
+            warehouse.sync(db)
         print(f"[agent] {db.run_id} {path.name}: {status}", flush=True)
 
 
