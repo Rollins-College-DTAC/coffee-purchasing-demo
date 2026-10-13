@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-10-13T21:42:50+00:00",
+  "date": "2026-10-13",
+  "imports_by_status": [
+    {
+      "status": "held",
+      "n": 2
+    },
+    {
+      "status": "published",
+      "n": 73
+    }
+  ],
+  "held_imports": [
+    {
+      "file_name": "coffee_20261013-2120.csv",
+      "mean_price_per_lb": 9.9105,
+      "status": "held",
+      "decided_by": null,
+      "z": 4.665
+    },
+    {
+      "file_name": "coffee_20261013-2127.json",
+      "mean_price_per_lb": 8.417,
+      "status": "held",
+      "decided_by": null,
+      "z": 3.284
+    }
+  ],
+  "incidents_by_kind": [
+    {
+      "kind": "injection",
+      "status": "open",
+      "n": 8
+    },
+    {
+      "kind": "trigger",
+      "status": "open",
+      "n": 2
+    }
+  ],
+  "model_usage": [
+    {
+      "expert": "claude-haiku-5-5",
+      "task": "extract",
+      "calls": 547,
+      "live_calls": 204,
+      "cost_usd": 0.0348
+    },
+    {
+      "expert": "claude-sonnet-5-5",
+      "task": "explain",
+      "calls": 2,
+      "live_calls": 2,
+      "cost_usd": 0.0089
+    },
+    {
+      "expert": "jev",
+      "task": "classify",
+      "calls": 555,
+      "live_calls": 208,
+      "cost_usd": 0.0075
+    },
+    {
+      "expert": "rules",
+      "task": "classify",
+      "calls": 14,
+      "live_calls": 0,
+      "cost_usd": 0.0
+    }
+  ],
+  "latest_forecast": {
+    "interpretation": "Next import expected at $5.50/lb; 95% of imports should fall between $3.85 and $7.15.",
+    "result": 5.498,
+    "computed_at": "2026-10-13T21:42:50+00:00"
+  },
+  "latest_actual": {
+    "file_name": "coffee_20261013-2142.csv",
+    "mean_price_per_lb": 5.7558
+  },
+  "trigger_rule": "anomaly: |z| > threshold on import mean $/lb vs recent published imports"
+}

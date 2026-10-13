@@ -1,0 +1,5 @@
+inbox/
+processed/
+quarantine/
+*.sqlite-wal
+*.sqlite-shm
