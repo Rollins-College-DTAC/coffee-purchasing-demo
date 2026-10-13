@@ -19,8 +19,8 @@ Built with the `analytics-final-project` skill. Simulated data only.
 | # | Milestone | Done when | Status |
 |---|---|---|---|
 | 1 | Repo, environment, data generator (one import per minute) | A new file lands every minute and its name is logged | done |
-| 2 | ETL loop: detect, hash, land in TinyDB, run log, SQL logging | A duplicate file is skipped and shown in the log | **current** |
-| 3 | Expert models: MoE router, Jev classification, Claude extraction, review queue, gold set | 50 hand-labeled records scored; model usage logged | |
+| 2 | ETL loop: detect, hash, land in TinyDB, run log, SQL logging | A duplicate file is skipped and shown in the log | done |
+| 3 | Expert models: MoE router, Jev classification, Claude extraction, review queue, gold set | 50 hand-labeled records scored; model usage logged | **current** |
 | 4 | Clean into SQLite + Snowflake, statistics, forecast, trigger and action | The trigger fires on a seeded anomaly in a test | |
 | 5 | Streamlit dashboard: live flow chart, step panels with SQL and formulas, MoE view | An import is held and released on screen with its file name, SQL and formula | |
 | 6 | Cloud: GitHub Actions pipeline, Streamlit Community Cloud, Claude Routine | The public app updates every minute during a demo run | |
@@ -36,6 +36,14 @@ GitHub: https://github.com/Rollins-College-DTAC/coffee-purchasing-demo
 - CSV and JSON use different field names; JSON packs units into strings (`"6.87 USD/lb"`, `"9,279 lbs"`).
 - Files are written as `.<name>.tmp` then renamed: the agent must ignore dot files.
 - `generator_log.csv` records every file, seeded anomalies (`spike`, `drop`, `mix_shift`; none in the first 5 imports) and `_resend` copies (`copy_of`).
+
+## Agent notes (Milestone 2)
+
+- `uv run python -m agent.loop` scans `inbox/` every 15 s; `--once` processes and exits (for GitHub Actions).
+- `agent/etl.py::process_file` runs Detect (SHA-256; skip if a prior `land` step with that hash is `ok`) and Land (raw records into TinyDB `data/raw.json`, tagged `_run_id`, `_file_name`, `_file_sha256`, `_landed_at`).
+- Duplicates move to `processed/` with a `warning` row in `run_log`; unparseable files move to `quarantine/` with `failed`.
+- `agent/db.py::Database.run_sql(step, sql, params)` is the only way to query; it writes `sql_log`. `start_step`/`finish_step` write `run_log` (not logged to `sql_log`).
+- All six log tables are created now; later milestones fill them.
 
 ## Rules
 
