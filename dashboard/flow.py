@@ -37,8 +37,8 @@ def build_dot(steps, details, edge_rows):
     if act:
         taken = "hold" if act == "held" else "publish"
         state[taken] = act
-    lines = ['digraph G {', 'rankdir=LR; bgcolor="transparent";',
-             'node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, penwidth=2];',
+    lines = ['digraph G {', 'rankdir=TB; bgcolor="transparent"; nodesep=0.35; ranksep=0.45;',
+             'node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=13, penwidth=2];',
              'edge [fontname="Helvetica", fontsize=9, color="#8a8985", fontcolor="#52514e"];']
     for node, title in NODES:
         status = state.get(node, "waiting")
@@ -56,5 +56,9 @@ def build_dot(steps, details, edge_rows):
         label = f'label="{edge_rows[(a, b)]} rows"' if (a, b) in edge_rows else ""
         attrs = ", ".join(x for x in (style, label) if x)
         lines.append(f"{a} -> {b}" + (f" [{attrs}]" if attrs else "") + ";")
+    # Two rows so the chart stays readable in a narrow window: ingest on top, decide and act below
+    lines.append("detect -> decide [style=invis];  // start row 2 under row 1's first node")
+    lines.append("{rank=same; detect; land; redact; classify; extract; load;}")
+    lines.append("{rank=same; decide; publish; statistics; warehouse;}")
     lines.append("}")
     return "\n".join(lines)
