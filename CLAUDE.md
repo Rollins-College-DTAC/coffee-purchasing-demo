@@ -22,8 +22,8 @@ Built with the `analytics-final-project` skill. Simulated data only.
 | 2 | ETL loop: detect, hash, land in TinyDB, run log, SQL logging | A duplicate file is skipped and shown in the log | done |
 | 3 | Expert models: MoE router, Jev classification, Claude extraction, review queue, gold set | 50 hand-labeled records scored; model usage logged | **current** — built and scored; waiting on the instructor's review of `gold_set.csv` labels |
 | 4 | Clean into SQLite + Snowflake, statistics, forecast, trigger and action | The trigger fires on a seeded anomaly in a test. Also: generator writes varied buyer notes (not just the fixed 11, so live runs make real model calls) and occasional injection notes, logged in `generator_log.csv` | done |
-| 5 | Streamlit dashboard: live flow chart, step panels with SQL and formulas, MoE view | An import is held and released on screen with its file name, SQL and formula | **current** |
-| 6 | Cloud: GitHub Actions pipeline, Streamlit Community Cloud, Claude Routine | The public app updates every minute during a demo run | |
+| 5 | Streamlit dashboard: live flow chart, step panels with SQL and formulas, MoE view | An import is held and released on screen with its file name, SQL and formula | done (tested; instructor's own button release pending) |
+| 6 | Cloud: GitHub Actions pipeline, Streamlit Community Cloud, Claude Routine | The public app updates every minute during a demo run | **current** |
 | 7 | Governance docs, prompt-injection test, 30-second Claude Motion overview, README, BINGO card | `scripts/check_bingo.py` passes on the README | |
 
 ## Repo
@@ -69,6 +69,15 @@ GitHub: https://github.com/Rollins-College-DTAC/coffee-purchasing-demo
 - Generator: `--backfill N` writes N past imports first; half the notes are templates with random numbers (real model calls); `injection_lots` column in `generator_log.csv`.
 - `uv run python -m scripts.score_trigger` reports trigger precision/recall against `generator_log.csv`.
 - Live run 2026-10-13 (backfill 60 + 10 live, min_history 10 at the time): 70 files, 8 held; trigger recall 1.00 (spike + 2 mix_shift), precision 0.38 (5 false alarms, 4 of them in the first 21 imports). min_history raised to 30 afterwards. Injection: 7 of 7 planted notes quarantined, 0 false. Cost: Haiku $0.034, Sonnet explain $0.066, Jev $0.007. 8 held imports are waiting for a person in `agent.review list`.
+
+## Dashboard notes (Milestone 5)
+
+- `uv run streamlit run streamlit_app.py` (or the `dashboard` entry in `.claude/launch.json`). Pages in `dashboard/pages/`: live, models, analytics, data, history, governance.
+- `dashboard/data.py` reads read-only from `DASHBOARD_DB`, else `data/analytics.sqlite` (live), else the committed snapshot `demo/analytics.sqlite` (what Streamlit Cloud shows until Milestone 6). Escape `$` with `md()` before `st.markdown`.
+- Live run: held-import banner with Release/Reject (local only; calls `agent.review.decide`), Graphviz flow chart in `st.fragment(run_every=5)` built by `dashboard/flow.py` (two rows), one expander per `run_log` step with SQL, params, formulas.
+- Refresh the snapshot: `sqlite3 data/analytics.sqlite ".backup demo/analytics.sqlite"`, then `PRAGMA journal_mode=DELETE; DELETE FROM model_cache; VACUUM;`.
+- Streamlit Cloud installs from `uv.lock` (checked before requirements.txt); set Python 3.12 in the app's advanced settings. As of 2026-10-13 the app URL returns "no access or does not exist" (repo is private).
+- `tests/test_dashboard.py` renders every page with `AppTest` on a copy of the snapshot and clicks Release.
 
 ## Rules
 
