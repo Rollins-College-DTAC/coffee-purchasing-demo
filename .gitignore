@@ -1,0 +1,17 @@
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Runtime data (generated each run)
+inbox/*
+!inbox/.gitkeep
+processed/
+quarantine/
+data/
+generator_log.csv

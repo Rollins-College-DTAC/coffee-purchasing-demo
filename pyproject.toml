@@ -1,0 +1,16 @@
+[project]
+name = "coffee-purchasing-demo"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "faker==40.43.0",
+    "pandas==3.0.6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
