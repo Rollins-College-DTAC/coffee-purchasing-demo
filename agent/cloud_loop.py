@@ -4,7 +4,7 @@ Each minute: apply review decisions (GitHub issues titled "review: release|rejec
 write one fake import, run the pipeline on it, export exports/daily_summary.json, then commit
 the state to the `data` branch (one amended commit, force-pushed) for the Streamlit app.
 
-Run (in Actions):  uv run python -m agent.cloud_loop --minutes 15 --state state/ [--backfill 40]
+Run (in Actions):  uv run python -m agent.cloud_loop --minutes 30 --state state/   (started by "Start demo")
 Run (try locally): uv run python -m agent.cloud_loop --minutes 2 --state /tmp/state --no-push
 """
 
@@ -20,6 +20,7 @@ from pathlib import Path
 
 REVIEW_TITLE = re.compile(r"^review: (release|reject) (run-[0-9]{8}-[0-9]{6}-[0-9a-f]{4})$")
 REVIEWER = re.compile(r"^[\w .,'-]{1,60}$")
+AUTO_HISTORY = 40  # enough published imports for the trigger (min_history 30) and the forecast (20)
 
 
 def point_paths_at(state):
@@ -128,7 +129,8 @@ def publish(db, state, push):
 def main():
     parser = argparse.ArgumentParser(description="Run the pipeline once a minute and publish state.")
     parser.add_argument("--minutes", type=int, default=15)
-    parser.add_argument("--backfill", type=int, default=0, help="first write N past imports (history)")
+    parser.add_argument("--backfill", default="auto",
+                        help="past imports to write first: a number, or 'auto' to top history up to 40")
     parser.add_argument("--state", type=Path, default=Path("state"))
     parser.add_argument("--no-push", action="store_true", help="run without committing (local try-out)")
     args = parser.parse_args()
@@ -152,9 +154,12 @@ def main():
     suppliers = gen.make_suppliers(fake)
     summary_path = state / "exports" / "daily_summary.json"
 
-    for back in range(args.backfill, 0, -1):
+    have = db.conn.execute("SELECT COUNT(*) FROM imports").fetchone()[0]
+    backfill = max(0, AUTO_HISTORY - have) if args.backfill == "auto" else int(args.backfill)
+    print(f"[cloud] {have} imports in history; backfilling {backfill}", flush=True)
+    for back in range(backfill, 0, -1):
         gen.write_import(gen.INBOX, gen.LOG, datetime.now() - timedelta(minutes=back), rng, suppliers)
-    if args.backfill:
+    if backfill:
         scan(db, raw, enricher)
         export_summary(db, summary_path)
         publish(db, state, not args.no_push)

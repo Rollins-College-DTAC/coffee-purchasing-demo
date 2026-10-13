@@ -12,16 +12,20 @@ import pandas as pd
 import streamlit as st
 
 from agent import settings
+from dashboard import cloud
 
 SNAPSHOT = settings.ROOT / "demo" / "analytics.sqlite"
 
 
 def source():
-    """(path, kind) where kind is 'local' (live agent database) or 'snapshot'."""
+    """(path, kind): 'local' (the agent's own database), 'cloud' (the data branch, via GitHub)
+    or 'snapshot' (committed copy, used when neither is available)."""
     if os.environ.get("DASHBOARD_DB"):
         return Path(os.environ["DASHBOARD_DB"]), os.environ.get("DASHBOARD_KIND", "local")
     if settings.SQLITE_PATH.exists():
         return settings.SQLITE_PATH, "local"
+    if cloud.enabled() and (path := cloud.database_path()):
+        return path, "cloud"
     return SNAPSHOT, "snapshot"
 
 
@@ -46,10 +50,13 @@ def md(text):
 
 def source_note():
     path, kind = source()
+    last = query("SELECT MAX(finished_at) AS t FROM run_log")["t"].iloc[0]
     if kind == "snapshot":
-        last = query("SELECT MAX(finished_at) AS t FROM run_log")["t"].iloc[0]
-        st.caption(f"Showing a saved snapshot of a local run (last import {last} UTC). "
-                   "Live cloud data arrives in Milestone 6. Simulated data only.")
+        st.caption(f"Showing a saved snapshot of a local run (last step {last} UTC). "
+                   "Press Start demo for live data. Simulated data only.")
+    elif kind == "cloud":
+        st.caption(f"Cloud data from the `data` branch, refreshed every 30 s (last step {last} UTC). "
+                   "Simulated data only.")
     else:
         st.caption(f"Live: reading `{path.name}` read-only. Simulated data only.")
     return kind

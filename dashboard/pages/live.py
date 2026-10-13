@@ -1,11 +1,13 @@
 """Live run: held-import alerts, the live flow chart, and one panel per pipeline step."""
 
 import json
+import time
 from datetime import datetime
 
 import pandas as pd
 import streamlit as st
 
+from dashboard import cloud
 from dashboard.data import md, query, source, source_note
 from dashboard.flow import build_dot
 
@@ -60,8 +62,27 @@ if len(held):
                     st.warning(f"{h.file_name}: {release_or_reject(h.run_id, False, name)}")
                     st.cache_data.clear()
                     st.rerun()
+            elif kind == "cloud":
+                c1, c2, c3, c4 = st.columns([2, 2, 1, 1])
+                name = c1.text_input("Your name", key=f"name-{h.run_id}", placeholder="recorded in the logs")
+                code = c2.text_input("Passcode", key=f"code-{h.run_id}", type="password")
+                for col, label, release in ((c3, "Release", True), (c4, "Reject", False)):
+                    if col.button(label, key=f"{label[:3].lower()}-{h.run_id}", disabled=not (name and code),
+                                  type="primary" if release else "secondary"):
+                        if not cloud.passcode_ok(code):
+                            st.error("Wrong passcode.")
+                        elif not cloud.reviewer_ok(name):
+                            st.error("Use letters, spaces and . , ' - only (up to 60).")
+                        else:
+                            url = cloud.request_review(h.run_id, release, name)
+                            cloud.pending_reviews.clear()
+                            st.success(f"Requested ({url}). The running demo applies it within a minute; "
+                                       "if no demo is running, it is applied when the next one starts.")
             else:
-                st.caption("Release / Reject works in the local app now and from the cloud app in Milestone 6.")
+                st.caption("Release / Reject works in the local app, and in the cloud app once it has live data.")
+    if kind == "cloud":
+        for title in cloud.pending_reviews():
+            st.info(f"Waiting for the pipeline: {title}")
 
 
 # ---------- Which run ----------
@@ -87,6 +108,12 @@ def flow_and_panels():
     file_name = log["file_name"].dropna().iloc[0] if log["file_name"].notna().any() else ""
 
     steps = dict(zip(log["step"], log["status"]))
+    replay = kind == "cloud" and follow
+    if replay:  # cloud data lands once a minute: replay the latest run one step every 2 s
+        order = list(steps)
+        k = int(time.time() // 2) % (len(order) + 3)
+        steps = {st_: (status if i < k else "running" if i == k else "waiting")
+                 for i, (st_, status) in enumerate(steps.items())}
     experts = {s: ", ".join(f"{g.expert} ×{g.n}" for g in usage[usage.step == s].itertuples())
                for s in ("classify", "extract")}
     details = {"detect": file_name, "classify": experts["classify"], "extract": experts["extract"]}
@@ -101,9 +128,10 @@ def flow_and_panels():
     ago = ""
     if isinstance(finished, str):
         secs = (datetime.now().astimezone() - datetime.fromisoformat(finished)).total_seconds()
-        ago = f" · last step finished {secs:,.0f} s ago" if kind == "local" else ""
+        ago = f" · last step finished {secs:,.0f} s ago"
     st.subheader(f"{file_name}")
-    st.caption(f"{run_id}{ago}")
+    st.caption(f"{run_id}{ago}" + (" · **replay** of the latest run (cloud data arrives once a minute)"
+                                    if replay else ""))
     st.graphviz_chart(build_dot(steps, details, edges), width="stretch")
 
     sql = query("SELECT step, sql_text, params_json, rows_affected, duration_ms FROM sql_log WHERE run_id = ?", (run_id,))

@@ -42,3 +42,34 @@ def test_release_button_releases_the_held_import(db):
     status, by = sqlite3.connect(db).execute(
         "SELECT status, decided_by FROM imports WHERE run_id = ?", (held,)).fetchone()
     assert (status, by) == ("released", "Test Buyer")
+
+
+def test_cloud_release_files_a_review_issue_behind_the_passcode(db, monkeypatch):
+    from dashboard import cloud
+    monkeypatch.setenv("DASHBOARD_KIND", "cloud")
+    posted = []
+
+    def fake_api(method, path, body=None, raw=False):
+        if method == "POST":
+            posted.append((path, body))
+            return {"html_url": "https://github.com/o/r/issues/1"}
+        return []
+
+    monkeypatch.setattr(cloud, "api", fake_api)
+    held = sqlite3.connect(db).execute(
+        "SELECT run_id FROM imports WHERE status = 'held' ORDER BY loaded_at DESC LIMIT 1").fetchone()[0]
+    at = AppTest.from_file(str(ROOT / "dashboard" / "pages" / "live.py"), default_timeout=60)
+    at.secrets["GH_TOKEN"] = "test"
+    at.secrets["APP_PASSCODE"] = "beans"
+    at.run()
+    at.text_input(key=f"name-{held}").input("Test Buyer")
+    at.text_input(key=f"code-{held}").input("wrong").run()
+    at.button(key=f"rel-{held}").click().run()
+    assert posted == [] and "Wrong passcode." in [e.value for e in at.error]
+
+    at.text_input(key=f"code-{held}").input("beans").run()
+    at.button(key=f"rel-{held}").click().run()
+    assert not at.exception, [e.value for e in at.exception]
+    assert posted == [("/issues", {"title": f"review: release {held}", "body": '{"reviewer": "Test Buyer"}'})]
+    # the database is untouched: the pipeline applies the request
+    assert sqlite3.connect(db).execute("SELECT status FROM imports WHERE run_id = ?", (held,)).fetchone()[0] == "held"
