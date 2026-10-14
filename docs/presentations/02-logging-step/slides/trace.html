@@ -1,0 +1,21 @@
+<section id="trace" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Worked example · coffee_20261013-1511.csv</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Reading the log of one held import</h2>
+</div>
+<table style="font-size:24px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:16%">Step</th><th style="width:12%">Status</th><th style="width:72%">Message</th></tr>
+<tr><td>detect</td><td>ok</td><td>1268 bytes, sha256 96682b555799…</td></tr>
+<tr><td>land</td><td>ok</td><td>9 records to TinyDB; moved to processed/</td></tr>
+<tr><td>redact</td><td>ok</td><td>0 of 9 notes had personal data masked</td></tr>
+<tr><td>classify</td><td>ok</td><td>9 notes: 9 ok, 0 to review, 0 quarantined</td></tr>
+<tr><td>extract</td><td>ok</td><td>8 notes extracted, 0 escalated</td></tr>
+<tr><td>load</td><td>ok</td><td>9 lots loaded to SQLite, 0 rejected</td></tr>
+<tr style="background:#F6E3D3"><td><b>decide</b></td><td><b>held</b></td><td><b>|z| = 3.13 vs 3.0: hold_and_alert</b></td></tr>
+<tr style="background:#F6E3D3"><td><b>act</b></td><td><b>held</b></td><td><b>held out of gold; incident opened; waiting for a person</b></td></tr>
+<tr><td>statistics</td><td>ok</td><td>6 origin CIs; forecast waits for 20 imports</td></tr>
+<tr><td>warehouse</td><td>ok</td><td>skipped: Snowflake not configured</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 7 / 9 · real rows from run_log, messages shortened</p>
+<aside>Walk down the table with the class. Everything was normal until decide: the import's average price was 3.13 standard deviations away from recent imports, beyond the threshold of 3. The act step then held the data and opened an incident. A person can now open stats_log for the exact numbers and sql_log for the exact query.</aside>
+</section>

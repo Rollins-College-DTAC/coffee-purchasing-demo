@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TinyDB vs SQLite</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400..700&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;padding:40px 0;background:#d9d6cf}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;margin:0 auto 40px}
+aside{display:none}
+.notes{width:1920px;margin:0 auto;box-sizing:border-box;padding:40px;background:#fff;font:18px/1.5 'IBM Plex Sans',Arial,sans-serif}
+</style>
+</head>
+<body>
+<section id="cover" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#E3A06F">Data Analytics with AI · Lecture 1</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1.05;color:#F7F5EF">TinyDB vs SQLite</h1>
+<p style="font-size:40px;line-height:1.3;color:#CBD5E1;width:1300px">Two ways to store data, and why the coffee project needs both</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Raw Coffee Purchasing · reference project · simulated data only</p>
+<aside>This lecture assumes no prior knowledge of databases. By the end, students should be able to say what a database is, tell a document database from a relational one, and explain why the project keeps raw and clean data apart.</aside>
+</section>
+<section id="objectives" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Learning objectives</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">By the end of this lecture you can</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">1</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Define</b> a database, and say what problem it solves.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">2</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Distinguish</b> a document database (TinyDB) from a relational one (SQLite).</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">3</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Explain</b> why the project keeps raw data apart from clean data.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1500px">A <b>database</b> is an organized store of data that a program can search, update and summarize, so the data survives after the program stops.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 2 / 9</p>
+<aside>Read the definition of a database aloud. Ask: where have you used one today? Answers might include a phone's contact list or a library catalogue; both are databases.</aside>
+</section>
+<section id="shapes" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">The problem</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">The same facts arrive in different shapes</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:32px;font-weight:600;color:#1F2A37">A CSV file (a table as text)</h3>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:32px;border-radius:12px">lot_id,origin,price,price_unit<br>LOT-0000-00,ETH,5.80,$/lb<br>LOT-0000-01,Columbia,10.14,USD/kg</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:32px;font-weight:600;color:#1F2A37">A JSON file (labeled fields)</h3>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:32px;border-radius:12px">{"lotId": "LOT-0001-00",<br> "Origin": "Kenya Nyeri",<br> "price": "6.87 USD/lb"}</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1600px">Field names differ (<b>lot_id</b> vs <b>lotId</b>), units differ ($/lb vs USD/kg), and names are misspelled (<b>Columbia</b>). We must keep this exactly as received, and also turn it into one clean shape.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 3 / 9</p>
+<aside>These records come from the project's generator, which makes the data messy on purpose. CSV is comma-separated values: a table written as plain text. JSON is JavaScript Object Notation: each value has a label. Ask students to find three differences between the two records before revealing the caption.</aside>
+</section>
+<section id="document" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · TinyDB</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A document database stores each record as it is</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">Each record is a self-contained <b>document</b>. Two records need not have the same fields. TinyDB keeps all documents in one JSON file.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A box of index cards. One card holds a recipe, the next a phone number; each card can say anything.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37"><b>data/raw.json</b> keeps both records from the previous slide unchanged, each tagged with its file name, hash and arrival time.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 4 / 9</p>
+<aside>Key point: a document database does not force a structure, so nothing is lost on arrival. That flexibility is also its weakness: averaging prices is hard when some records say lot_id and others lotId, and prices carry units inside the text.</aside>
+</section>
+<section id="relational" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 2 · SQLite</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A relational database stores rows in fixed tables</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">Every row in a <b>table</b> has the same columns, and every column has one type, such as text or number. We ask questions in <b>SQL</b>, Structured Query Language.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A teacher's gradebook: one row per student, one column per test, a number in every cell. Averaging a column is easy.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:36%">lot_id</th><th style="width:24%">origin</th><th style="width:22%;text-align:right">lbs</th><th style="width:18%;text-align:right">$/lb</th></tr>
+<tr><td>LOT-0000-00</td><td>Kenya</td><td style="text-align:right">35,139</td><td style="text-align:right">6.11</td></tr>
+<tr><td>LOT-0000-01</td><td>Sumatra</td><td style="text-align:right">12,930</td><td style="text-align:right">3.87</td></tr>
+</table>
+<p style="font-size:24px;color:#6B7280">The <b>purchases</b> table in data/analytics.sqlite</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 5 / 9</p>
+<aside>Point at the project table: every price is now a plain number in dollars per pound, every origin a single spelling. That uniformity is what makes averages, confidence intervals and charts possible. The rows shown are real rows from the reference run.</aside>
+</section>
+<section id="compare" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Side by side</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Each one is good at a different job</h2>
+</div>
+<table style="font-size:30px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:22%"></th><th style="width:39%">TinyDB</th><th style="width:39%">SQLite</th></tr>
+<tr><td><b>Stores</b></td><td>Documents with any fields</td><td>Rows with fixed, typed columns</td></tr>
+<tr><td><b>Ask questions in</b></td><td>Python</td><td>SQL</td></tr>
+<tr><td><b>Good at</b></td><td>Keeping messy data unchanged</td><td>Averages, counts, joins, charts</td></tr>
+<tr><td><b>Weak at</b></td><td>Calculations across records</td><td>Data that does not fit its columns</td></tr>
+<tr><td><b>In the project</b></td><td>Raw layer: data/raw.json</td><td>Clean layer: data/analytics.sqlite</td></tr>
+</table>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1600px">Both are small databases stored in a single file on your computer: no server to install.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 6 / 9</p>
+<aside>Large organizations use the same two ideas at scale: document stores such as MongoDB, and relational databases such as PostgreSQL or cloud warehouses such as Snowflake, which this project can also load into. The concepts transfer; only the size changes.</aside>
+</section>
+<section id="layers" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Why both</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Keep the original, analyze the clean copy</h2>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center">Supplier file</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#F6E3D3;border:2px solid #9C4A1A;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center"><b>TinyDB</b><br>raw layer</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center">Clean and validate</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#DCE8F5;border:2px solid #2A6FB0;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center"><b>SQLite</b><br>clean layer</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center">Dashboard</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A photographer keeps the original photo and edits a copy. A bad edit never ruins the picture.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A buyer disputes a price. We compare the clean row with the raw record exactly as the supplier sent it.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 7 / 9</p>
+<aside>This is the raw-versus-clean layer pattern used across the data industry, sometimes called bronze, silver and gold. Raw data is evidence; the clean layer is our interpretation of it. If a cleaning rule is wrong, we fix the rule and clean again from raw, without asking the supplier to resend anything.</aside>
+</section>
+<section id="query" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Asking questions</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A query is a question the database answers</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#9C4A1A">TinyDB, in Python</h3>
+<p style="font-size:26px;color:#3D4652">1. Every record from one file</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">raw.search(Query()._file_name<br>  == "coffee_20261013-1511.csv")</p>
+<p style="font-size:26px;color:#3D4652">2. One lot by its ID</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">raw.search(Query().lot_id<br>  == "LOT-0072-08")</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#2A6FB0">SQLite, in SQL</h3>
+<p style="font-size:26px;color:#3D4652">1. Average price of Kenyan lots</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">SELECT AVG(price_per_lb)<br>FROM purchases WHERE origin = 'Kenya';</p>
+<p style="font-size:26px;color:#3D4652">2. How many lots per origin</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">SELECT origin, COUNT(*)<br>FROM purchases GROUP BY origin;</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 8 / 9</p>
+<aside>TinyDB queries find records; SQL queries can also calculate across them. Read the SQL aloud as English: select the average price per pound from purchases where the origin is Kenya. In the project every SQL query passes through one function, run_sql, which records it in the sql_log table; that is the subject of the logging lecture.</aside>
+</section>
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>A new supplier sends a file with a field called <b>vendor_name</b>. Which database accepts it unchanged, and why?</li>
+<li>You need the average $/lb of Brazilian coffee this week. Which database do you ask, and in which language?</li>
+<li>A cleaning rule turned "Columbia" into "Bolivia" by mistake. What lets you repair the data without asking the supplier?</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">TinyDB vs SQLite · 9 / 9</p>
+<aside>Answers. 1: TinyDB, because documents need not share fields. 2: SQLite, with an SQL query such as SELECT AVG(price_per_lb) FROM purchases WHERE origin = 'Brazil'. 3: the raw layer in TinyDB still holds the original record, so you fix the rule and clean again.</aside>
+</section>
+<div class="notes">
+<h2>Speaker notes</h2>
+<ol style="list-style:none;padding:0">
+<li><b>1. cover</b> — This lecture assumes no prior knowledge of databases. By the end, students should be able to say what a database is, tell a document database from a relational one, and explain why the project keeps raw and clean data apart.</li>
+<li><b>2. objectives</b> — Read the definition of a database aloud. Ask: where have you used one today? Answers might include a phone&#x27;s contact list or a library catalogue; both are databases.</li>
+<li><b>3. shapes</b> — These records come from the project&#x27;s generator, which makes the data messy on purpose. CSV is comma-separated values: a table written as plain text. JSON is JavaScript Object Notation: each value has a label. Ask students to find three differences between the two records before revealing the caption.</li>
+<li><b>4. document</b> — Key point: a document database does not force a structure, so nothing is lost on arrival. That flexibility is also its weakness: averaging prices is hard when some records say lot_id and others lotId, and prices carry units inside the text.</li>
+<li><b>5. relational</b> — Point at the project table: every price is now a plain number in dollars per pound, every origin a single spelling. That uniformity is what makes averages, confidence intervals and charts possible. The rows shown are real rows from the reference run.</li>
+<li><b>6. compare</b> — Large organizations use the same two ideas at scale: document stores such as MongoDB, and relational databases such as PostgreSQL or cloud warehouses such as Snowflake, which this project can also load into. The concepts transfer; only the size changes.</li>
+<li><b>7. layers</b> — This is the raw-versus-clean layer pattern used across the data industry, sometimes called bronze, silver and gold. Raw data is evidence; the clean layer is our interpretation of it. If a cleaning rule is wrong, we fix the rule and clean again from raw, without asking the supplier to resend anything.</li>
+<li><b>8. query</b> — TinyDB queries find records; SQL queries can also calculate across them. Read the SQL aloud as English: select the average price per pound from purchases where the origin is Kenya. In the project every SQL query passes through one function, run_sql, which records it in the sql_log table; that is the subject of the logging lecture.</li>
+<li><b>9. check</b> — Answers. 1: TinyDB, because documents need not share fields. 2: SQLite, with an SQL query such as SELECT AVG(price_per_lb) FROM purchases WHERE origin = &#x27;Brazil&#x27;. 3: the raw layer in TinyDB still holds the original record, so you fix the rule and clean again.</li>
+</ol>
+</div>
+</body>
+</html>

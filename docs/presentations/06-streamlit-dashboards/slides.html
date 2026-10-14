@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Streamlit Dashboards</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400..700&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;padding:40px 0;background:#d9d6cf}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;margin:0 auto 40px}
+aside{display:none}
+.notes{width:1920px;margin:0 auto;box-sizing:border-box;padding:40px;background:#fff;font:18px/1.5 'IBM Plex Sans',Arial,sans-serif}
+</style>
+</head>
+<body>
+<section id="cover" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#E3A06F">Data Analytics with AI · Lecture 6</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1.05;color:#F7F5EF">Streamlit Dashboards</h1>
+<p style="font-size:40px;line-height:1.3;color:#CBD5E1;width:1300px">Turning a Python script into a web page anyone can open</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Raw Coffee Purchasing · reference project · simulated data only</p>
+<aside>The dashboard is the part of the project that people see: classmates, the instructor, and later an interviewer. This lecture explains how Streamlit builds it and how it reaches the web.</aside>
+</section>
+<section id="objectives" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Learning objectives</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">By the end of this lecture you can</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">1</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Explain</b> how Streamlit turns a script into a web page, and why it reruns.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">2</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Identify</b> the elements and pages of the project's dashboard.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">3</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Deploy</b> it to the web with its secrets kept safe.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1500px">A <b>dashboard</b> is a single screen that summarizes data for decisions, like a car's dashboard summarizes speed, fuel and warnings.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 2 / 9</p>
+<aside>No web development knowledge is needed. Streamlit hides HTML, CSS and JavaScript: you write Python, and it builds the page.</aside>
+</section>
+<section id="what" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · a script becomes a page</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Each Streamlit line draws one thing on the page</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · four lines</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">import streamlit as st<br>st.title("Coffee prices")<br>st.metric("Mean $/lb", "$5.15")<br>st.line_chart(prices)</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">A title, a big number and a chart, in that order, top to bottom.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">uv run streamlit run<br>  streamlit_app.py</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">Opens the six-page dashboard in your browser at localhost:8501, reading the agent's SQLite database.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 3 / 9</p>
+<aside>Streamlit is an open-source Python library. A function call such as st.metric both computes and displays, so a data analyst can build an interactive page without learning web programming. localhost means "this computer": the page is only visible to you until it is deployed.</aside>
+</section>
+<section id="rerun" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 2 · the rerun model</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Any click reruns the whole script from the top</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">Streamlit does not patch the page. When someone presses a button or changes a choice, it runs the script again and redraws everything with the new state. Simple to reason about: the page always matches the code.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">A spreadsheet: change one cell and every formula recalculates, so totals are never stale.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:20px;border-radius:12px">if st.button("Release"):<br>    decide(run_id, "release")</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">After the click the script reruns, and the held-import banner is gone.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 4 / 9</p>
+<aside>Because everything reruns, slow work such as downloading the database is cached: in cloud mode the app keeps the downloaded data for 30 seconds instead of fetching it on every click. The button code is simplified from dashboard/pages/live.py, which also asks for the reviewer's name and, in the cloud, a passcode.</aside>
+</section>
+<section id="elements" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 3 · elements</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Seven building blocks make the whole dashboard</h2>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">Like the gauges, warning lights and switches on a car dashboard, each element has one job.</p>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:24%">Element</th><th style="width:30%">Shows</th><th style="width:46%">Example in the project</th></tr>
+<tr><td><b>st.metric</b></td><td>one big number</td><td>Trigger recall 1.00 (Analytics)</td></tr>
+<tr><td><b>st.altair_chart</b></td><td>an interactive chart</td><td>z-score dots with the ±3 lines (Analytics)</td></tr>
+<tr><td><b>st.expander</b></td><td>a section that opens on click</td><td>"How this was calculated" under each chart</td></tr>
+<tr><td><b>st.latex</b></td><td>a typeset formula</td><td>the z-score formula in the decide step panel</td></tr>
+<tr><td><b>st.graphviz_chart</b></td><td>a diagram from text</td><td>the live flow chart of pipeline steps</td></tr>
+<tr><td><b>st.dataframe</b></td><td>a sortable table</td><td>the review queue (Governance)</td></tr>
+<tr><td><b>st.button</b></td><td>an action</td><td>Release or Reject a held import (Live run)</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 5 / 9</p>
+<aside>Every element here appears in the project's code under dashboard/pages. Altair is a charting library that Streamlit displays; Graphviz draws diagrams from a short text description of boxes and arrows.</aside>
+</section>
+<section id="pages" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 4 · one page per question</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Each page answers one question a person asks</h2>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">A newspaper has sections so readers can go straight to sport or business. streamlit_app.py lists six pages in a side menu.</p>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:24%">Page</th><th style="width:76%">The question it answers</th></tr>
+<tr style="background:#F6E3D3"><td><b>Live run</b></td><td>What is the agent doing now, and is anything waiting for me?</td></tr>
+<tr><td><b>Models (MoE)</b></td><td>Which model handled which task, why, and at what cost?</td></tr>
+<tr><td><b>Analytics</b></td><td>What do the statistics say, and how were they calculated?</td></tr>
+<tr><td><b>Data</b></td><td>What do the clean purchase lots look like, and how good is the data?</td></tr>
+<tr><td><b>Pipeline history</b></td><td>How long did each step take over recent runs?</td></tr>
+<tr><td><b>Governance</b></td><td>How do the models score, what needs review, and what have we spent?</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 6 / 9 · dashboard/pages/</p>
+<aside>Designing a dashboard starts from questions, not from charts. Ask students to write the three questions their own buyer or manager would ask, and to give each its own page or section.</aside>
+</section>
+<section id="live" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 5 · live refresh</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">The flow chart redraws itself every 5 seconds</h2>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>detect</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>land</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>classify</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>load</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#F6E3D3;border:3px solid #B4531F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>decide</b><br>held</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#F6E3D3;border:3px solid #B4531F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>act</b><br>held</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">An airport departures board updates each flight's status by itself; nobody presses refresh.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4">A <b>fragment</b>, @st.fragment(run_every=5), reruns only the chart, colouring each step from run_log.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 7 / 9 · simplified view of the Live run page</p>
+<aside>A fragment is a part of the page that reruns on its own, so the rest of the page, such as a half-typed reviewer name, is not disturbed. Each status is written in words as well as colour, so the chart still reads for colour-blind viewers. The real chart has more steps, drawn in two rows.</aside>
+</section>
+<section id="deploy" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 6 · deployment and secrets</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Push to GitHub, the cloud runs it, secrets stay out</h2>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:24px"><p style="font-size:26px;text-align:center"><b>Your laptop</b><br>commit and push</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:24px"><p style="font-size:26px;text-align:center"><b>GitHub</b><br>branch main</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#DCE8F5;border:2px solid #2A6FB0;border-radius:12px;padding:24px"><p style="font-size:26px;text-align:center"><b>Streamlit Cloud</b><br>runs streamlit_app.py</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:24px"><p style="font-size:26px;text-align:center"><b>Anyone</b><br>with the link</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">A shop's window display is public; the safe's combination is kept in the manager's head, not taped to the window.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4">GH_TOKEN and APP_PASSCODE live in the app's Settings, then Secrets. The passcode guards Start demo, Release and Reject.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 8 / 9</p>
+<aside>Three settings decide whether the deploy works: the file must be called streamlit_app.py at the repository's top level, the branch must be main, and Python must be set to 3.12 in the advanced settings. Packages install from uv.lock, so the cloud runs the same versions as the laptop. Every later push to main updates the app automatically, which is called continuous deployment.</aside>
+</section>
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>A user clicks Release. What does Streamlit do next, and why does the banner disappear?</li>
+<li>Which element would you use to show the trigger's recall, and which to show how it was calculated?</li>
+<li>The Deploy button stays grey. Name two likely causes.</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Streamlit Dashboards · 9 / 9</p>
+<aside>Answers. 1: it reruns the script from the top; the release changed the database, so on the rerun the import is no longer held and the banner is not drawn. 2: st.metric for the number; st.expander holding st.code for the SQL and st.latex for the formula. 3: the URL names the wrong branch (master instead of main), or streamlit_app.py has not been pushed to GitHub yet.</aside>
+</section>
+<div class="notes">
+<h2>Speaker notes</h2>
+<ol style="list-style:none;padding:0">
+<li><b>1. cover</b> — The dashboard is the part of the project that people see: classmates, the instructor, and later an interviewer. This lecture explains how Streamlit builds it and how it reaches the web.</li>
+<li><b>2. objectives</b> — No web development knowledge is needed. Streamlit hides HTML, CSS and JavaScript: you write Python, and it builds the page.</li>
+<li><b>3. what</b> — Streamlit is an open-source Python library. A function call such as st.metric both computes and displays, so a data analyst can build an interactive page without learning web programming. localhost means &quot;this computer&quot;: the page is only visible to you until it is deployed.</li>
+<li><b>4. rerun</b> — Because everything reruns, slow work such as downloading the database is cached: in cloud mode the app keeps the downloaded data for 30 seconds instead of fetching it on every click. The button code is simplified from dashboard/pages/live.py, which also asks for the reviewer&#x27;s name and, in the cloud, a passcode.</li>
+<li><b>5. elements</b> — Every element here appears in the project&#x27;s code under dashboard/pages. Altair is a charting library that Streamlit displays; Graphviz draws diagrams from a short text description of boxes and arrows.</li>
+<li><b>6. pages</b> — Designing a dashboard starts from questions, not from charts. Ask students to write the three questions their own buyer or manager would ask, and to give each its own page or section.</li>
+<li><b>7. live</b> — A fragment is a part of the page that reruns on its own, so the rest of the page, such as a half-typed reviewer name, is not disturbed. Each status is written in words as well as colour, so the chart still reads for colour-blind viewers. The real chart has more steps, drawn in two rows.</li>
+<li><b>8. deploy</b> — Three settings decide whether the deploy works: the file must be called streamlit_app.py at the repository&#x27;s top level, the branch must be main, and Python must be set to 3.12 in the advanced settings. Packages install from uv.lock, so the cloud runs the same versions as the laptop. Every later push to main updates the app automatically, which is called continuous deployment.</li>
+<li><b>9. check</b> — Answers. 1: it reruns the script from the top; the release changed the database, so on the rerun the import is no longer held and the banner is not drawn. 2: st.metric for the number; st.expander holding st.code for the SQL and st.latex for the formula. 3: the URL names the wrong branch (master instead of main), or streamlit_app.py has not been pushed to GitHub yet.</li>
+</ol>
+</div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<section id="onedoor" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 3 · a single entry point</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Every query goes through one door, which writes the log</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">If logging is optional, someone eventually forgets it. So the project allows <b>one function</b>, <b>run_sql</b>, to touch the database, and that function always records the query.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A laboratory with one entrance and a sign-in sheet at the door. Nobody can enter without leaving a name and a time.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">db.run_sql("decide",<br> "SELECT ... LIMIT ?",<br> (run_id, 60))</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">The <b>?</b> marks are filled in safely by the database, and both the query and the values land in sql_log.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 6 / 9</p>
+<aside>Placeholders, the question marks, keep data separate from commands. If a supplier's note contained SQL text, it would be stored as text, never run as a command. This is SQL injection prevention, a close cousin of the prompt-injection defense taught in the Jev lecture.</aside>
+</section>

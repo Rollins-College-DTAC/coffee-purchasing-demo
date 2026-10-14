@@ -1,0 +1,19 @@
+<section id="document" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · TinyDB</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A document database stores each record as it is</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">Each record is a self-contained <b>document</b>. Two records need not have the same fields. TinyDB keeps all documents in one JSON file.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A box of index cards. One card holds a recipe, the next a phone number; each card can say anything.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37"><b>data/raw.json</b> keeps both records from the previous slide unchanged, each tagged with its file name, hash and arrival time.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 4 / 9</p>
+<aside>Key point: a document database does not force a structure, so nothing is lost on arrival. That flexibility is also its weakness: averaging prices is hard when some records say lot_id and others lotId, and prices carry units inside the text.</aside>
+</section>

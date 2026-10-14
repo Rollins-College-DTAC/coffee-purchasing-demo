@@ -1,0 +1,19 @@
+<section id="idea" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · mixture of experts</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Specialists plus a gate that picks one for each input</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">In machine learning, a <b>mixture of experts</b> combines specialist sub-models with a <b>gate</b> that sends each input to the right one (Jacobs et al., 1991). Large modern models use it so that only a few experts work on each word (Shazeer et al., 2017).</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">Hospital triage: a nurse sends a sprained ankle to the walk-in clinic and chest pain to the cardiologist. Nobody sees every specialist.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">The same idea across whole models: a <b>router</b> with readable rules sends sorting to Jev and number-finding to Claude.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 3 / 9</p>
+<aside>Be precise with students: inside a large model the gate is learned, not written by hand, and nobody can read its reasons. The project borrows the idea at the application level, where the gate is plain rules a person can read and every choice is logged with its reason.</aside>
+</section>

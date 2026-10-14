@@ -1,0 +1,13 @@
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>A user clicks Release. What does Streamlit do next, and why does the banner disappear?</li>
+<li>Which element would you use to show the trigger's recall, and which to show how it was calculated?</li>
+<li>The Deploy button stays grey. Name two likely causes.</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Streamlit Dashboards · 9 / 9</p>
+<aside>Answers. 1: it reruns the script from the top; the release changed the database, so on the rerun the import is no longer held and the banner is not drawn. 2: st.metric for the number; st.expander holding st.code for the SQL and st.latex for the formula. 3: the URL names the wrong branch (master instead of main), or streamlit_app.py has not been pushed to GitHub yet.</aside>
+</section>

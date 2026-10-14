@@ -1,0 +1,29 @@
+<section id="layers" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Why both</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Keep the original, analyze the clean copy</h2>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center">Supplier file</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#F6E3D3;border:2px solid #9C4A1A;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center"><b>TinyDB</b><br>raw layer</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center">Clean and validate</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#DCE8F5;border:2px solid #2A6FB0;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center"><b>SQLite</b><br>clean layer</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:48px;height:24px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center">Dashboard</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A photographer keeps the original photo and edits a copy. A bad edit never ruins the picture.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A buyer disputes a price. We compare the clean row with the raw record exactly as the supplier sent it.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 7 / 9</p>
+<aside>This is the raw-versus-clean layer pattern used across the data industry, sometimes called bronze, silver and gold. Raw data is evidence; the clean layer is our interpretation of it. If a cleaning rule is wrong, we fix the rule and clean again from raw, without asking the supplier to resend anything.</aside>
+</section>

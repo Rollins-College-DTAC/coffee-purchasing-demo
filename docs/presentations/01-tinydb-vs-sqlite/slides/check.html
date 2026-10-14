@@ -1,0 +1,13 @@
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>A new supplier sends a file with a field called <b>vendor_name</b>. Which database accepts it unchanged, and why?</li>
+<li>You need the average $/lb of Brazilian coffee this week. Which database do you ask, and in which language?</li>
+<li>A cleaning rule turned "Columbia" into "Bolivia" by mistake. What lets you repair the data without asking the supplier?</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">TinyDB vs SQLite · 9 / 9</p>
+<aside>Answers. 1: TinyDB, because documents need not share fields. 2: SQLite, with an SQL query such as SELECT AVG(price_per_lb) FROM purchases WHERE origin = 'Brazil'. 3: the raw layer in TinyDB still holds the original record, so you fix the rule and clean again.</aside>
+</section>

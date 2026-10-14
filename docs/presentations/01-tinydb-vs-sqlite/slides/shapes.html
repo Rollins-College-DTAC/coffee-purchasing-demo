@@ -1,0 +1,19 @@
+<section id="shapes" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">The problem</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">The same facts arrive in different shapes</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:32px;font-weight:600;color:#1F2A37">A CSV file (a table as text)</h3>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:32px;border-radius:12px">lot_id,origin,price,price_unit<br>LOT-0000-00,ETH,5.80,$/lb<br>LOT-0000-01,Columbia,10.14,USD/kg</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:32px;font-weight:600;color:#1F2A37">A JSON file (labeled fields)</h3>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:32px;border-radius:12px">{"lotId": "LOT-0001-00",<br> "Origin": "Kenya Nyeri",<br> "price": "6.87 USD/lb"}</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1600px">Field names differ (<b>lot_id</b> vs <b>lotId</b>), units differ ($/lb vs USD/kg), and names are misspelled (<b>Columbia</b>). We must keep this exactly as received, and also turn it into one clean shape.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 3 / 9</p>
+<aside>These records come from the project's generator, which makes the data messy on purpose. CSV is comma-separated values: a table written as plain text. JSON is JavaScript Object Notation: each value has a label. Ask students to find three differences between the two records before revealing the caption.</aside>
+</section>

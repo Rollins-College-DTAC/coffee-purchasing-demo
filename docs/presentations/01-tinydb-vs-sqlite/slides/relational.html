@@ -1,0 +1,24 @@
+<section id="relational" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 2 · SQLite</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A relational database stores rows in fixed tables</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">Every row in a <b>table</b> has the same columns, and every column has one type, such as text or number. We ask questions in <b>SQL</b>, Structured Query Language.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A teacher's gradebook: one row per student, one column per test, a number in every cell. Averaging a column is easy.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:36%">lot_id</th><th style="width:24%">origin</th><th style="width:22%;text-align:right">lbs</th><th style="width:18%;text-align:right">$/lb</th></tr>
+<tr><td>LOT-0000-00</td><td>Kenya</td><td style="text-align:right">35,139</td><td style="text-align:right">6.11</td></tr>
+<tr><td>LOT-0000-01</td><td>Sumatra</td><td style="text-align:right">12,930</td><td style="text-align:right">3.87</td></tr>
+</table>
+<p style="font-size:24px;color:#6B7280">The <b>purchases</b> table in data/analytics.sqlite</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 5 / 9</p>
+<aside>Point at the project table: every price is now a plain number in dollars per pound, every origin a single spelling. That uniformity is what makes averages, confidence intervals and charts possible. The rows shown are real rows from the reference run.</aside>
+</section>

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Logging Step</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400..700&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;padding:40px 0;background:#d9d6cf}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;margin:0 auto 40px}
+aside{display:none}
+.notes{width:1920px;margin:0 auto;box-sizing:border-box;padding:40px;background:#fff;font:18px/1.5 'IBM Plex Sans',Arial,sans-serif}
+</style>
+</head>
+<body>
+<section id="cover" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#E3A06F">Data Analytics with AI · Lecture 2</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1.05;color:#F7F5EF">The Logging Step</h1>
+<p style="font-size:40px;line-height:1.3;color:#CBD5E1;width:1300px">How an AI agent keeps a record that anyone can check</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Raw Coffee Purchasing · reference project · simulated data only</p>
+<aside>An agent acts without a person watching each step. This lecture explains how it writes down everything it does, so that a person can check, explain and correct its work afterwards.</aside>
+</section>
+<section id="objectives" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Learning objectives</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">By the end of this lecture you can</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">1</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Define</b> a log and an audit trail.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">2</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Name</b> the project's six log tables and what each records.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">3</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Trace</b> one held import from its arrival to its decision.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1500px">The rule behind this lecture: <b>every step logs the file name, the SQL it ran, the model it used, and any formula with its values.</b></p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 2 / 9</p>
+<aside>The rule in bold is one of the project's non-negotiable rules. Everything else in this lecture shows how it is put into practice.</aside>
+</section>
+<section id="log" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · the log</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A log is a time-stamped record of what happened</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">Each <b>log entry</b> says when something happened, what it was, and what it affected. Entries are added, never edited, so the history cannot quietly change.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A ship's logbook: every hour the crew writes the time, position, speed and weather. After a storm, the log shows what was done and when.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">coffee_20261013-1511.csv<br>land · ok<br>9 records to TinyDB;<br>moved to processed/</p>
+<p style="font-size:24px;color:#6B7280">One row of run_log, the step log</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 3 / 9</p>
+<aside>Stress the append-only property: a log you can edit afterwards proves nothing. In the project, each step writes a row when it starts and fills in its finish time and status when it ends.</aside>
+</section>
+<section id="audit" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 2 · the audit trail</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">An audit trail lets someone else check every decision</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">An <b>audit trail</b> is a set of logs complete enough that a person who was not there can rebuild each decision and judge whether it was right. It is the basis of <b>governance</b>: accountability for automated work.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A bank statement lists every payment with date, amount and payee. You can spot a charge you never made and dispute it.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A buyer asks why an import was held. The logs show the query that fetched past prices, the formula, its values, and the threshold it crossed.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 4 / 9</p>
+<aside>A single log answers "what happened". An audit trail also answers "why", which requires the inputs, the rule applied and the result. Slide 7 walks through a real example.</aside>
+</section>
+<section id="tables" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">In the project</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Six log tables, each with one job</h2>
+</div>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:21%">Table</th><th style="width:23%">One row per</th><th style="width:56%">Example from the reference run</th></tr>
+<tr><td><b>run_log</b></td><td>pipeline step</td><td>decide · held · |z| = 3.13 vs 3.0</td></tr>
+<tr><td><b>sql_log</b></td><td>database query</td><td>SELECT mean_price_per_lb FROM gold_import_stats …</td></tr>
+<tr><td><b>model_usage_log</b></td><td>AI model call</td><td>jev · classify · 63 ms · reason: questions go to Jev</td></tr>
+<tr><td><b>stats_log</b></td><td>statistic computed</td><td>z_score · x = 4.456, mean = 5.154, s = 0.222, n = 10</td></tr>
+<tr><td><b>decision_log</b></td><td>publish or hold</td><td>anomaly · statistic −3.13 · hold_and_alert</td></tr>
+<tr><td><b>incident_log</b></td><td>event needing a person</td><td>trigger · coffee_20261013-1511.csv held</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">All six live in SQLite, so the dashboard can show them with ordinary queries. Every row carries the run ID and file name.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 5 / 9</p>
+<aside>Each table answers a different question. run_log: what ran, and did it succeed? sql_log: what data did it read or change? model_usage_log: which AI did it ask, why, and at what cost? stats_log: what was calculated, with which inputs? decision_log: what did it decide? incident_log: what needs a person? The run ID ties all six together.</aside>
+</section>
+<section id="onedoor" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 3 · a single entry point</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Every query goes through one door, which writes the log</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">If logging is optional, someone eventually forgets it. So the project allows <b>one function</b>, <b>run_sql</b>, to touch the database, and that function always records the query.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A laboratory with one entrance and a sign-in sheet at the door. Nobody can enter without leaving a name and a time.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">db.run_sql("decide",<br> "SELECT ... LIMIT ?",<br> (run_id, 60))</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">The <b>?</b> marks are filled in safely by the database, and both the query and the values land in sql_log.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 6 / 9</p>
+<aside>Placeholders, the question marks, keep data separate from commands. If a supplier's note contained SQL text, it would be stored as text, never run as a command. This is SQL injection prevention, a close cousin of the prompt-injection defense taught in the Jev lecture.</aside>
+</section>
+<section id="trace" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Worked example · coffee_20261013-1511.csv</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Reading the log of one held import</h2>
+</div>
+<table style="font-size:24px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:16%">Step</th><th style="width:12%">Status</th><th style="width:72%">Message</th></tr>
+<tr><td>detect</td><td>ok</td><td>1268 bytes, sha256 96682b555799…</td></tr>
+<tr><td>land</td><td>ok</td><td>9 records to TinyDB; moved to processed/</td></tr>
+<tr><td>redact</td><td>ok</td><td>0 of 9 notes had personal data masked</td></tr>
+<tr><td>classify</td><td>ok</td><td>9 notes: 9 ok, 0 to review, 0 quarantined</td></tr>
+<tr><td>extract</td><td>ok</td><td>8 notes extracted, 0 escalated</td></tr>
+<tr><td>load</td><td>ok</td><td>9 lots loaded to SQLite, 0 rejected</td></tr>
+<tr style="background:#F6E3D3"><td><b>decide</b></td><td><b>held</b></td><td><b>|z| = 3.13 vs 3.0: hold_and_alert</b></td></tr>
+<tr style="background:#F6E3D3"><td><b>act</b></td><td><b>held</b></td><td><b>held out of gold; incident opened; waiting for a person</b></td></tr>
+<tr><td>statistics</td><td>ok</td><td>6 origin CIs; forecast waits for 20 imports</td></tr>
+<tr><td>warehouse</td><td>ok</td><td>skipped: Snowflake not configured</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 7 / 9 · real rows from run_log, messages shortened</p>
+<aside>Walk down the table with the class. Everything was normal until decide: the import's average price was 3.13 standard deviations away from recent imports, beyond the threshold of 3. The act step then held the data and opened an incident. A person can now open stats_log for the exact numbers and sql_log for the exact query.</aside>
+</section>
+<section id="goodentry" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 4 · a good entry</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A good entry answers what, when, which, why, and never holds a secret</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4;color:#1F2A37"><b>Weak:</b> "gave meds"</p>
+<p style="font-size:28px;line-height:1.4;color:#1F2A37"><b>Strong:</b> "Ibuprofen 400 mg, by mouth, 14:05, Nurse K., for fever of 38.6 °C"</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4;color:#1F2A37"><b>Weak:</b> "called the AI"</p>
+<p style="font-size:28px;line-height:1.4;color:#1F2A37"><b>Strong:</b> "jev · classify · reason: classify questions go to Jev · 63 ms · confidence 1.00 · $0.00004"</p>
+</div>
+</div>
+<div style="display:flex;gap:20px;align-items:center;background:#1F2A37;border-radius:16px;padding:32px 40px">
+<x-icon name="Lock" style="color:#E3A06F;width:48px;height:48px"></x-icon>
+<p style="font-size:28px;line-height:1.4;color:#F7F5EF">Never log a key or password. When the project checks an API key, it logs only "set, 108 characters", never the key itself.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">The Logging Step · 8 / 9</p>
+<aside>Logs are often read by more people than the code, and are stored for a long time. Anything secret written into a log should be treated as leaked. Personal data deserves the same care, which is why the project masks emails and phone numbers before notes reach any model.</aside>
+</section>
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>A buyer asks which AI model sorted a note, and why. Which log table answers?</li>
+<li>Why does the project send every query through one function instead of letting each step write its own log?</li>
+<li>Rewrite this weak entry as a strong one: "import held".</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">The Logging Step · 9 / 9</p>
+<aside>Answers. 1: model_usage_log, which stores the expert and the route reason for every call. 2: so that logging cannot be forgotten or skipped; the only way to reach the database writes the log. 3: for example, "coffee_20261013-1511.csv held at 15:11: mean $4.46/lb, z = −3.13 against the last 10 imports (threshold 3); incident opened".</aside>
+</section>
+<div class="notes">
+<h2>Speaker notes</h2>
+<ol style="list-style:none;padding:0">
+<li><b>1. cover</b> — An agent acts without a person watching each step. This lecture explains how it writes down everything it does, so that a person can check, explain and correct its work afterwards.</li>
+<li><b>2. objectives</b> — The rule in bold is one of the project&#x27;s non-negotiable rules. Everything else in this lecture shows how it is put into practice.</li>
+<li><b>3. log</b> — Stress the append-only property: a log you can edit afterwards proves nothing. In the project, each step writes a row when it starts and fills in its finish time and status when it ends.</li>
+<li><b>4. audit</b> — A single log answers &quot;what happened&quot;. An audit trail also answers &quot;why&quot;, which requires the inputs, the rule applied and the result. Slide 7 walks through a real example.</li>
+<li><b>5. tables</b> — Each table answers a different question. run_log: what ran, and did it succeed? sql_log: what data did it read or change? model_usage_log: which AI did it ask, why, and at what cost? stats_log: what was calculated, with which inputs? decision_log: what did it decide? incident_log: what needs a person? The run ID ties all six together.</li>
+<li><b>6. onedoor</b> — Placeholders, the question marks, keep data separate from commands. If a supplier&#x27;s note contained SQL text, it would be stored as text, never run as a command. This is SQL injection prevention, a close cousin of the prompt-injection defense taught in the Jev lecture.</li>
+<li><b>7. trace</b> — Walk down the table with the class. Everything was normal until decide: the import&#x27;s average price was 3.13 standard deviations away from recent imports, beyond the threshold of 3. The act step then held the data and opened an incident. A person can now open stats_log for the exact numbers and sql_log for the exact query.</li>
+<li><b>8. goodentry</b> — Logs are often read by more people than the code, and are stored for a long time. Anything secret written into a log should be treated as leaked. Personal data deserves the same care, which is why the project masks emails and phone numbers before notes reach any model.</li>
+<li><b>9. check</b> — Answers. 1: model_usage_log, which stores the expert and the route reason for every call. 2: so that logging cannot be forgotten or skipped; the only way to reach the database writes the log. 3: for example, &quot;coffee_20261013-1511.csv held at 15:11: mean $4.46/lb, z = −3.13 against the last 10 imports (threshold 3); incident opened&quot;.</li>
+</ol>
+</div>
+</body>
+</html>

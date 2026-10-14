@@ -1,0 +1,21 @@
+<section id="escalate" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concepts 2 and 3 · escalation and fallback</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Go up for hard cases; go down when a model is missing</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:2px solid #9C4A1A;border-radius:16px;padding:32px">
+<h3 style="font-size:32px;font-weight:600;color:#9C4A1A">Escalation: to a stronger expert</h3>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Everyday:</b> a help desk passes a hard question to a senior engineer.</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Project:</b> Haiku marks its extraction "low confidence", so Sonnet tries again; both calls are logged.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:2px solid #2A6FB0;border-radius:16px;padding:32px">
+<h3 style="font-size:32px;font-weight:600;color:#2A6FB0">Fallback: to a simpler expert</h3>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Everyday:</b> during a phone outage, staff answer from a printed FAQ.</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Project:</b> Jev unreachable, so Claude answers the same questions; no Claude key, so keyword rules guess and a person reviews.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">Together they give <b>graceful degradation</b>: the agent keeps working at lower quality instead of stopping, and says so in the log.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 6 / 9</p>
+<aside>Escalation spends more only on the few hard cases. Fallback keeps the pipeline alive during an outage. In both cases a person can see from the log that something unusual happened, and every rules guess on a real note is sent to the review queue.</aside>
+</section>

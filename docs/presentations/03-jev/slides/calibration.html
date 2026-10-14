@@ -1,0 +1,19 @@
+<section id="calibration" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 4 · calibration</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A calibrated model is right as often as it claims</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">If a model says 90% sure a hundred times, it should be right about ninety times. Many neural networks are overconfident, so calibration must be measured, not assumed (Guo et al., 2017).</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A forecaster who says "70% chance of rain" should see rain on about 7 of every 10 such days.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">On the 50-note gold set, Jev was at least 90% confident on 45 notes and right on <b>44 of them (98%)</b>.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Jev · 7 / 10 · exports/gold_calibration.csv, reference run 2026-10-13</p>
+<aside>Caution for honesty: the reference gold set was labeled by Claude at the instructor's request, not by hand, so treat these numbers as a demonstration. Students label their own gold set and compute their own calibration. The Brier score, covered in the statistics lecture, combines accuracy and calibration in one number; Jev's was 0.106 on categories and 0.015 on injection.</aside>
+</section>

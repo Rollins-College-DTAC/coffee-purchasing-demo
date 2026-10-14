@@ -1,0 +1,13 @@
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>Which question type would you use to ask: "Is this supplier new to us?" And: "How well does this coffee cup, from poor to excellent?"</li>
+<li>Jev gives quality 0.40, logistics 0.35, pricing 0.25 for a three-option question. Compute the confidence. Would the project send it to review?</li>
+<li>Why should Jev not be used to pull the freight price out of a note?</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Jev · 10 / 10</p>
+<aside>Answers. 1: a Noul for the yes-or-no question; a Score for the ordered scale from poor to excellent. 2: (0.40 − 1/3) ÷ (1 − 1/3) = 0.067 ÷ 0.667 = 0.10; below 0.6, so yes, it goes to review. 3: Jev only chooses among options you supply; it cannot write a value it was not given. Extraction is Claude's job, checked by Pydantic and by the invented-values count.</aside>
+</section>

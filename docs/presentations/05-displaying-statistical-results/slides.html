@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Displaying Statistical Results</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400..700&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;padding:40px 0;background:#d9d6cf}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;margin:0 auto 40px}
+aside{display:none}
+.notes{width:1920px;margin:0 auto;box-sizing:border-box;padding:40px;background:#fff;font:18px/1.5 'IBM Plex Sans',Arial,sans-serif}
+</style>
+</head>
+<body>
+<section id="cover" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#E3A06F">Data Analytics with AI · Lecture 5</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1.05;color:#F7F5EF">Displaying Statistical Results</h1>
+<p style="font-size:40px;line-height:1.3;color:#CBD5E1;width:1300px">Showing a test so that anyone can check it: formula, inputs, result, threshold, meaning</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Raw Coffee Purchasing · reference project · simulated data only</p>
+<aside>Every chart in this lecture uses real numbers from the reference run of 2026-10-13. The statistics themselves are introduced from scratch; the focus is on how to show them honestly.</aside>
+</section>
+<section id="objectives" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Learning objectives</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">By the end of this lecture you can</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">1</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>List</b> the five parts every displayed result needs.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">2</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Read</b> a confidence interval, a z-score chart and a forecast band.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">3</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Report</b> a result honestly, even when the model loses.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1500px">A <b>statistical test</b> turns data into a number and compares it with a rule, so that a decision rests on evidence rather than a hunch.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 2 / 11</p>
+<aside>The project's rule: every formula is shown with its values. A number on a dashboard that nobody can check is an opinion, not evidence.</aside>
+</section>
+<section id="anatomy" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · the five parts</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A result is checkable only with all five parts</h2>
+</div>
+<div style="display:flex;gap:20px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<h3 style="font-size:28px;font-weight:600;color:#9C4A1A">Formula</h3>
+<p style="font-size:26px;line-height:1.4">z = (x − mean) ÷ s</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<h3 style="font-size:28px;font-weight:600;color:#9C4A1A">Inputs</h3>
+<p style="font-size:26px;line-height:1.4">x = $4.46<br>mean = $5.15<br>s = $0.22, n = 10</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<h3 style="font-size:28px;font-weight:600;color:#9C4A1A">Result</h3>
+<p style="font-size:26px;line-height:1.4">z = −3.13</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<h3 style="font-size:28px;font-weight:600;color:#9C4A1A">Threshold</h3>
+<p style="font-size:26px;line-height:1.4">|z| above 3 means hold</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<h3 style="font-size:28px;font-weight:600;color:#9C4A1A">Meaning</h3>
+<p style="font-size:26px;line-height:1.4">3.1 deviations below recent imports: hold for review</p>
+</div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">A blood test report: the test, your value, the normal range, an H or L flag, and the doctor's note.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4">The five cards above: one row of stats_log for the held import coffee_20261013-1511.csv.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 3 / 11</p>
+<aside>Each part answers a question a sceptic would ask. Formula: what did you compute? Inputs: from what? Result: what came out? Threshold: compared with what rule? Meaning: so what? In the project, agent/stats.py returns exactly these five fields for every method, and log_stat saves them to stats_log.</aside>
+</section>
+<section id="ci" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 2 · the 95% confidence interval</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">An average from a sample comes with a margin of error</h2>
+</div>
+<div style="display:flex;gap:32px;align-items:center">
+<p style="flex:1;font-size:30px;line-height:1.4;color:#3D4652">A <b>95% confidence interval</b> is a range built so that 95 of every 100 such ranges contain the true average. More data gives a narrower range.</p>
+<p style="flex:1;font-family:'Source Serif 4', Georgia, serif;font-size:40px;text-align:center;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">mean ± t × s ÷ √n</p>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">An election poll: "52%, plus or minus 3 points". The true support is most likely between 49% and 55%.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4">Brazilian coffee after 8 lots: <b>$3.45 to $3.79</b> per lb. After 81 lots: <b>$3.60 to $3.71</b>. Same coffee, more data, tighter range.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 4 / 11</p>
+<aside>Read the formula in words: the average, plus or minus a multiplier from the t distribution, times the spread, divided by the square root of the number of lots. The square root of n is why more data narrows the interval: four times the data halves the width. For 8 lots the multiplier t was 2.365.</aside>
+</section>
+<section id="cichart" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Chart 1 · dot and whisker</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Mean $/lb by origin, with 95% intervals</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="width:200px;display:flex;flex-direction:column">
+<p style="font-size:28px;line-height:56px">Brazil</p>
+<p style="font-size:28px;line-height:56px">Sumatra</p>
+<p style="font-size:28px;line-height:56px">Colombia</p>
+<p style="font-size:28px;line-height:56px">Guatemala</p>
+<p style="font-size:28px;line-height:56px">Ethiopia</p>
+<p style="font-size:28px;line-height:56px">Kenya</p>
+</div>
+<div style="width:900px;display:flex;flex-direction:column;gap:8px">
+<svg aria-label="Dot and whisker chart of mean price per pound by origin with 95% confidence intervals, from Brazil at 3.65 dollars to Kenya at 6.96 dollars" width="900" height="336" viewBox="0 0 900 336">
+<g stroke="#DDD6C8" stroke-width="2"><line x1="1" y1="0" x2="1" y2="336"/><line x1="200" y1="0" x2="200" y2="336"/><line x1="400" y1="0" x2="400" y2="336"/><line x1="600" y1="0" x2="600" y2="336"/><line x1="800" y1="0" x2="800" y2="336"/></g>
+<g stroke="#2A6FB0" stroke-width="5" stroke-linecap="round"><line x1="120" y1="28" x2="142" y2="28"/><line x1="292" y1="84" x2="318" y2="84"/><line x1="374" y1="140" x2="402" y2="140"/><line x1="432" y1="196" x2="458" y2="196"/><line x1="640" y1="252" x2="676" y2="252"/><line x1="770" y1="308" x2="814" y2="308"/></g>
+<g stroke="#2A6FB0" stroke-width="3"><line x1="120" y1="16" x2="120" y2="40"/><line x1="142" y1="16" x2="142" y2="40"/><line x1="292" y1="72" x2="292" y2="96"/><line x1="318" y1="72" x2="318" y2="96"/><line x1="374" y1="128" x2="374" y2="152"/><line x1="402" y1="128" x2="402" y2="152"/><line x1="432" y1="184" x2="432" y2="208"/><line x1="458" y1="184" x2="458" y2="208"/><line x1="640" y1="240" x2="640" y2="264"/><line x1="676" y1="240" x2="676" y2="264"/><line x1="770" y1="296" x2="770" y2="320"/><line x1="814" y1="296" x2="814" y2="320"/></g>
+<g fill="#1F2A37"><circle cx="130" cy="28" r="9"/><circle cx="304" cy="84" r="9"/><circle cx="388" cy="140" r="9"/><circle cx="446" cy="196" r="9"/><circle cx="658" cy="252" r="9"/><circle cx="792" cy="308" r="9"/></g>
+</svg>
+<div style="display:flex">
+<p style="width:200px;font-size:24px;color:#6B7280">$3</p>
+<p style="width:200px;font-size:24px;color:#6B7280">$4</p>
+<p style="width:200px;font-size:24px;color:#6B7280">$5</p>
+<p style="width:200px;font-size:24px;color:#6B7280">$6</p>
+<p style="width:100px;font-size:24px;color:#6B7280">$7</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<p style="font-size:26px;line-height:56px;color:#3D4652">$3.65 · 3.60–3.71 · n 81</p>
+<p style="font-size:26px;line-height:56px;color:#3D4652">$4.52 · 4.46–4.59 · n 84</p>
+<p style="font-size:26px;line-height:56px;color:#3D4652">$4.94 · 4.87–5.01 · n 77</p>
+<p style="font-size:26px;line-height:56px;color:#3D4652">$5.23 · 5.16–5.29 · n 93</p>
+<p style="font-size:26px;line-height:56px;color:#3D4652">$6.29 · 6.20–6.38 · n 87</p>
+<p style="font-size:26px;line-height:56px;color:#3D4652">$6.96 · 6.85–7.07 · n 69</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">How to read it: the dot is the sample mean, the whisker its 95% interval. No two whiskers overlap, so every origin's average price really differs from the others.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 5 / 11 · stats_log, reference run, prices in $ per lb</p>
+<aside>Point out the design choices: origins sorted by price so the eye reads a ranking; one colour, because colour carries no extra meaning here; exact values printed beside each row so nobody has to estimate from the axis. The same chart is on the dashboard's Analytics page, with the SQL and formula in an expander below it.</aside>
+</section>
+<section id="zscore" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 3 and chart 2 · the z-score</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">z-scores flag imports far from normal</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="display:flex;flex-direction:column;justify-content:space-between;height:360px;width:110px">
+<p style="font-size:24px;color:#6B7280;text-align:right">z = +6</p>
+<p style="font-size:24px;color:#9C4A1A;text-align:right">+3</p>
+<p style="font-size:24px;color:#6B7280;text-align:right">0</p>
+<p style="font-size:24px;color:#9C4A1A;text-align:right">−3</p>
+<p style="font-size:24px;color:#6B7280;text-align:right">−6</p>
+</div>
+<svg aria-label="Scatter of z-scores for 63 imports over time; 9 imports beyond plus or minus 3 were held, one of them at z = 14.3 off the scale" width="1400" height="360" viewBox="0 0 1400 360">
+<line x1="0" y1="180" x2="1400" y2="180" stroke="#DDD6C8" stroke-width="2"/>
+<line x1="0" y1="105" x2="1400" y2="105" stroke="#9C4A1A" stroke-width="2" stroke-dasharray="10 8"/>
+<line x1="0" y1="255" x2="1400" y2="255" stroke="#9C4A1A" stroke-width="2" stroke-dasharray="10 8"/>
+<circle cx="20" cy="258" r="9" fill="#B4531F"/><circle cx="42" cy="219" r="7" fill="#2A6FB0"/><circle cx="64" cy="259" r="9" fill="#B4531F"/><circle cx="86" cy="10" r="9" fill="#B4531F"/><circle cx="108" cy="174" r="7" fill="#2A6FB0"/><circle cx="130" cy="271" r="9" fill="#B4531F"/><circle cx="152" cy="135" r="7" fill="#2A6FB0"/><circle cx="174" cy="115" r="7" fill="#2A6FB0"/><circle cx="195" cy="177" r="7" fill="#2A6FB0"/><circle cx="217" cy="177" r="7" fill="#2A6FB0"/><circle cx="239" cy="78" r="9" fill="#B4531F"/><circle cx="261" cy="223" r="7" fill="#2A6FB0"/><circle cx="283" cy="207" r="7" fill="#2A6FB0"/><circle cx="305" cy="178" r="7" fill="#2A6FB0"/><circle cx="327" cy="204" r="7" fill="#2A6FB0"/><circle cx="349" cy="241" r="7" fill="#2A6FB0"/><circle cx="371" cy="227" r="7" fill="#2A6FB0"/><circle cx="393" cy="229" r="7" fill="#2A6FB0"/><circle cx="415" cy="246" r="7" fill="#2A6FB0"/><circle cx="437" cy="154" r="7" fill="#2A6FB0"/><circle cx="459" cy="185" r="7" fill="#2A6FB0"/><circle cx="481" cy="174" r="7" fill="#2A6FB0"/><circle cx="503" cy="135" r="7" fill="#2A6FB0"/><circle cx="525" cy="180" r="7" fill="#2A6FB0"/><circle cx="546" cy="111" r="7" fill="#2A6FB0"/><circle cx="568" cy="192" r="7" fill="#2A6FB0"/><circle cx="590" cy="200" r="7" fill="#2A6FB0"/><circle cx="612" cy="146" r="7" fill="#2A6FB0"/><circle cx="634" cy="148" r="7" fill="#2A6FB0"/><circle cx="656" cy="165" r="7" fill="#2A6FB0"/><circle cx="678" cy="227" r="7" fill="#2A6FB0"/><circle cx="700" cy="175" r="7" fill="#2A6FB0"/><circle cx="722" cy="160" r="7" fill="#2A6FB0"/><circle cx="744" cy="203" r="7" fill="#2A6FB0"/><circle cx="766" cy="155" r="7" fill="#2A6FB0"/><circle cx="788" cy="205" r="7" fill="#2A6FB0"/><circle cx="810" cy="154" r="7" fill="#2A6FB0"/><circle cx="832" cy="146" r="7" fill="#2A6FB0"/><circle cx="854" cy="139" r="7" fill="#2A6FB0"/><circle cx="875" cy="105" r="9" fill="#B4531F"/><circle cx="897" cy="156" r="7" fill="#2A6FB0"/><circle cx="919" cy="131" r="7" fill="#2A6FB0"/><circle cx="941" cy="133" r="7" fill="#2A6FB0"/><circle cx="963" cy="223" r="7" fill="#2A6FB0"/><circle cx="985" cy="180" r="7" fill="#2A6FB0"/><circle cx="1007" cy="221" r="7" fill="#2A6FB0"/><circle cx="1029" cy="171" r="7" fill="#2A6FB0"/><circle cx="1051" cy="218" r="7" fill="#2A6FB0"/><circle cx="1073" cy="155" r="7" fill="#2A6FB0"/><circle cx="1095" cy="173" r="7" fill="#2A6FB0"/><circle cx="1117" cy="201" r="7" fill="#2A6FB0"/><circle cx="1139" cy="161" r="7" fill="#2A6FB0"/><circle cx="1161" cy="169" r="7" fill="#2A6FB0"/><circle cx="1183" cy="190" r="7" fill="#2A6FB0"/><circle cx="1205" cy="126" r="7" fill="#2A6FB0"/><circle cx="1226" cy="125" r="7" fill="#2A6FB0"/><circle cx="1248" cy="46" r="9" fill="#B4531F"/><circle cx="1270" cy="67" r="9" fill="#B4531F"/><circle cx="1292" cy="178" r="7" fill="#2A6FB0"/><circle cx="1314" cy="148" r="7" fill="#2A6FB0"/><circle cx="1336" cy="160" r="7" fill="#2A6FB0"/><circle cx="1358" cy="176" r="7" fill="#2A6FB0"/><circle cx="1380" cy="84" r="9" fill="#B4531F"/>
+</svg>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:26px;line-height:1.4">Your power bill is usually $80, give or take $10. A $140 bill is z = (140 − 80) ÷ 10 = 6: call the utility.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:26px;line-height:1.4"><span style="color:#2A6FB0"><b>Blue: published.</b></span> <span style="color:#B4531F"><b>Orange: held</b></span> (|z| above 3), 9 of 63 imports. The top-left dot is z = 14.3, off the scale.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 6 / 11 · decision_log, reference run, imports in time order</p>
+<aside>z = (x − mean) ÷ s: how many standard deviations a value sits from the recent average. The dashed lines at plus and minus 3 are the trigger. Most dots cluster near zero, as expected. Clipping the 14.3 outlier at the top keeps the other 62 readable; the label says so, which is the honest way to clip a chart.</aside>
+</section>
+<section id="forecast" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 4 and chart 3 · the prediction interval</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Forecasts come with a prediction interval</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="display:flex;flex-direction:column;justify-content:space-between;height:300px;width:110px">
+<p style="font-size:24px;color:#6B7280;text-align:right">$6.50</p>
+<p style="font-size:24px;color:#6B7280;text-align:right">$5.50</p>
+<p style="font-size:24px;color:#6B7280;text-align:right">$4.50</p>
+</div>
+<svg aria-label="Line chart of the last 30 published imports' mean price per pound, then a flat forecast of 5.37 dollars for the next 5 imports with a shaded 95% band from 4.45 to 6.29 dollars" width="1400" height="380" viewBox="0 0 1400 380">
+<g stroke="#DDD6C8" stroke-width="2"><line x1="0" y1="34" x2="1400" y2="34"/><line x1="0" y1="176" x2="1400" y2="176"/><line x1="0" y1="318" x2="1400" y2="318"/></g>
+<polygon points="1220,64 1260,64 1300,63 1340,63 1380,63 1380,326 1340,326 1300,325 1260,325 1220,324" fill="#E3A06F" fill-opacity="0.35"/>
+<polyline points="20,195 60,338 100,219 140,184 180,284 220,173 260,289 300,172 340,151 380,132 420,167 460,106 500,107 540,330 580,223 620,327 660,201 700,323 740,159 780,205 820,278 860,175 900,196 940,250 980,86 1020,76 1060,215 1100,131 1140,163 1180,207" fill="none" stroke="#2A6FB0" stroke-width="4" stroke-linejoin="round"/>
+<polyline points="1180,207 1220,194 1260,194 1300,194 1340,194 1380,194" fill="none" stroke="#B4531F" stroke-width="4" stroke-dasharray="12 8"/>
+</svg>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:26px;line-height:1.4">"Tomorrow's high: 24 °C, likely between 21 and 27." The range matters as much as the number.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:26px;line-height:1.4"><span style="color:#2A6FB0"><b>Blue: last 30 imports.</b></span> <span style="color:#B4531F"><b>Orange: forecast $5.37/lb</b></span>, with 95% of imports expected between $4.45 and $6.29.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 7 / 11 · exponential smoothing on gold_import_stats, reference run</p>
+<aside>A confidence interval is about an average; a prediction interval is about one future value, so it is much wider. Here the band is wide, $4.45 to $6.29, because each import mixes different origins and its average jumps around. Showing that width is honest: a single line would suggest a precision the data do not support.</aside>
+</section>
+<section id="backtest" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Concept 5 · the backtest</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Report it honestly when the simple guess wins</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-top:4px solid #E3A06F;padding:24px 0px 0px 0px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1;color:#E3A06F">$0.44</p>
+<p style="font-size:28px;line-height:1.4;color:#CBD5E1">Forecast's average miss per lb on the last 10 imports (7.8%)</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-top:4px solid #8FB8E0;padding:24px 0px 0px 0px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1;color:#8FB8E0">$0.38</p>
+<p style="font-size:28px;line-height:1.4;color:#CBD5E1">Average miss of the naive guess, "same as the last import"</p>
+</div>
+</div>
+<div style="display:flex;gap:28px">
+<p style="flex:1;font-size:26px;line-height:1.4;color:#E2E8F0">A <b>backtest</b> hides recent data, forecasts it, and measures the <b>mean absolute error</b> (MAE): the average size of the misses.</p>
+<p style="flex:1;font-size:26px;line-height:1.4;color:#E2E8F0"><b>Everyday:</b> checking last week's weather forecasts against what happened.</p>
+<p style="flex:1;font-size:26px;line-height:1.4;color:#E2E8F0"><b>Project:</b> the dashboard prints "the baseline wins; the model adds nothing yet."</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Displaying Statistical Results · 8 / 11 · stats_log backtest_mae, reference run</p>
+<aside>This is the most important slide of the lecture. A forecast that cannot beat "same as last time" should not be trusted, and saying so is part of the analysis, not a failure. Hiding this result would mislead the buyer. The likely cause is the mix of origins in each import; forecasting price per origin is a sensible next step.</aside>
+</section>
+<section id="metrics" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 6 · precision and recall</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Grade the alarm, not only the data</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<h3 style="font-size:32px;font-weight:600;color:#1F2A37">Recall</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:600;line-height:1;color:#2A6FB0">1.00</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">Of the real anomalies, the share that were held. Every seeded anomaly was caught.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">
+<h3 style="font-size:32px;font-weight:600;color:#1F2A37">Precision</h3>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:600;line-height:1;color:#B4531F">0.38</p>
+<p style="font-size:26px;line-height:1.4;color:#3D4652">Of the held imports, the share that were real anomalies. 5 false alarms, most in the first 21 imports.</p>
+</div>
+</div>
+<div style="display:flex;gap:32px">
+<p style="flex:1;font-size:26px;line-height:1.4"><b>Everyday:</b> a smoke alarm with perfect recall never misses a fire; one with poor precision also goes off for toast.</p>
+<p style="flex:1;font-size:26px;line-height:1.4"><b>Project:</b> early imports gave too little history, so the minimum was raised from 10 to 30 imports before testing.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 9 / 11 · scripts/score_trigger.py against generator_log.csv</p>
+<aside>Because the data are simulated, the generator's log records which imports were seeded anomalies: an answer key for the trigger. Precision equals true positives divided by everything flagged; recall equals true positives divided by everything real. Show both, since either alone can be gamed: holding every import gives perfect recall and terrible precision.</aside>
+</section>
+<section id="showwork" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 7 · show your work</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Every chart opens to its query, formula and values</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="width:620px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">A maths teacher gives no marks for "42" alone; the working shows how you got there and where it went wrong.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4">Under each chart on the Analytics page, an expander titled "How this was calculated".</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:2px solid #9C4A1A;border-radius:16px;padding:32px">
+<p style="font-size:28px;font-weight:600">▾ How this was calculated</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">SELECT origin, price_per_lb<br>FROM gold_purchases</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:32px">mean ± t × s ÷ √n</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:24px;border-radius:12px">mean_ci_95:Brazil: mean = 3.62,<br>s = 0.197, n = 8, t = 2.365</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 10 / 11 · dashboard/pages/analytics.py</p>
+<aside>Check the arithmetic live with the class: 2.365 × 0.197 ÷ √8 = 2.365 × 0.197 ÷ 2.828 = 0.165. So the interval is 3.62 ± 0.16, from $3.45 to $3.79, matching the earlier slide. Anyone can now verify the chart without trusting the code.</aside>
+</section>
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>An import averages $5.80/lb; recent imports average $5.20 with s = $0.15. Compute z. Is it held?</li>
+<li>Two origins' 95% intervals are $4.40–$4.70 and $4.60–$4.90. What can you conclude, and what would help?</li>
+<li>A classmate's dashboard shows only "Forecast: $5.37". Name two things missing.</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Displaying Statistical Results · 11 / 11</p>
+<aside>Answers. 1: z = (5.80 − 5.20) ÷ 0.15 = 4.0, above 3, so it is held. 2: the intervals overlap, so we cannot be confident the averages differ; more lots would narrow both intervals. 3: any two of the prediction interval, the formula, the inputs, the backtest against the naive baseline, and a plain-language interpretation.</aside>
+</section>
+<div class="notes">
+<h2>Speaker notes</h2>
+<ol style="list-style:none;padding:0">
+<li><b>1. cover</b> — Every chart in this lecture uses real numbers from the reference run of 2026-10-13. The statistics themselves are introduced from scratch; the focus is on how to show them honestly.</li>
+<li><b>2. objectives</b> — The project&#x27;s rule: every formula is shown with its values. A number on a dashboard that nobody can check is an opinion, not evidence.</li>
+<li><b>3. anatomy</b> — Each part answers a question a sceptic would ask. Formula: what did you compute? Inputs: from what? Result: what came out? Threshold: compared with what rule? Meaning: so what? In the project, agent/stats.py returns exactly these five fields for every method, and log_stat saves them to stats_log.</li>
+<li><b>4. ci</b> — Read the formula in words: the average, plus or minus a multiplier from the t distribution, times the spread, divided by the square root of the number of lots. The square root of n is why more data narrows the interval: four times the data halves the width. For 8 lots the multiplier t was 2.365.</li>
+<li><b>5. cichart</b> — Point out the design choices: origins sorted by price so the eye reads a ranking; one colour, because colour carries no extra meaning here; exact values printed beside each row so nobody has to estimate from the axis. The same chart is on the dashboard&#x27;s Analytics page, with the SQL and formula in an expander below it.</li>
+<li><b>6. zscore</b> — z = (x − mean) ÷ s: how many standard deviations a value sits from the recent average. The dashed lines at plus and minus 3 are the trigger. Most dots cluster near zero, as expected. Clipping the 14.3 outlier at the top keeps the other 62 readable; the label says so, which is the honest way to clip a chart.</li>
+<li><b>7. forecast</b> — A confidence interval is about an average; a prediction interval is about one future value, so it is much wider. Here the band is wide, $4.45 to $6.29, because each import mixes different origins and its average jumps around. Showing that width is honest: a single line would suggest a precision the data do not support.</li>
+<li><b>8. backtest</b> — This is the most important slide of the lecture. A forecast that cannot beat &quot;same as last time&quot; should not be trusted, and saying so is part of the analysis, not a failure. Hiding this result would mislead the buyer. The likely cause is the mix of origins in each import; forecasting price per origin is a sensible next step.</li>
+<li><b>9. metrics</b> — Because the data are simulated, the generator&#x27;s log records which imports were seeded anomalies: an answer key for the trigger. Precision equals true positives divided by everything flagged; recall equals true positives divided by everything real. Show both, since either alone can be gamed: holding every import gives perfect recall and terrible precision.</li>
+<li><b>10. showwork</b> — Check the arithmetic live with the class: 2.365 × 0.197 ÷ √8 = 2.365 × 0.197 ÷ 2.828 = 0.165. So the interval is 3.62 ± 0.16, from $3.45 to $3.79, matching the earlier slide. Anyone can now verify the chart without trusting the code.</li>
+<li><b>11. check</b> — Answers. 1: z = (5.80 − 5.20) ÷ 0.15 = 4.0, above 3, so it is held. 2: the intervals overlap, so we cannot be confident the averages differ; more lots would narrow both intervals. 3: any two of the prediction interval, the formula, the inputs, the backtest against the naive baseline, and a plain-language interpretation.</li>
+</ol>
+</div>
+</body>
+</html>

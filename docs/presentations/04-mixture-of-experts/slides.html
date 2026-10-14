@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mixture of Experts and the Router</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400..700&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;padding:40px 0;background:#d9d6cf}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;margin:0 auto 40px}
+aside{display:none}
+.notes{width:1920px;margin:0 auto;box-sizing:border-box;padding:40px;background:#fff;font:18px/1.5 'IBM Plex Sans',Arial,sans-serif}
+</style>
+</head>
+<body>
+<section id="cover" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#E3A06F">Data Analytics with AI · Lecture 4</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:600;line-height:1.05;color:#F7F5EF">Mixture of Experts</h1>
+<p style="font-size:40px;line-height:1.3;color:#CBD5E1;width:1300px">How a router sends each job to the right model, and why that saves money</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Raw Coffee Purchasing · reference project · simulated data only</p>
+<aside>This lecture builds on the Jev lecture. Students should already know the difference between a classifier and a generative model.</aside>
+</section>
+<section id="objectives" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Learning objectives</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">By the end of this lecture you can</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">1</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Explain</b> what a mixture of experts is, inside a model and across models.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">2</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Apply</b> the router's rules to decide which expert handles a task.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;color:#9C4A1A">3</p>
+<p style="font-size:32px;line-height:1.4;color:#3D4652"><b>Describe</b> how escalation, fallback and caching control cost.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3D4652;width:1500px">An <b>expert</b>, here, is any component that can do a task: an AI model, or a few lines of plain rules.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 2 / 9</p>
+<aside>Emphasize that plain rules count as an expert. A well-designed system can always fall back to something simple and free.</aside>
+</section>
+<section id="idea" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 1 · mixture of experts</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Specialists plus a gate that picks one for each input</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#3D4652;width:1600px">In machine learning, a <b>mixture of experts</b> combines specialist sub-models with a <b>gate</b> that sends each input to the right one (Jacobs et al., 1991). Large modern models use it so that only a few experts work on each word (Shazeer et al., 2017).</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">Hospital triage: a nurse sends a sprained ankle to the walk-in clinic and chest pain to the cardiologist. Nobody sees every specialist.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">The same idea across whole models: a <b>router</b> with readable rules sends sorting to Jev and number-finding to Claude.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 3 / 9</p>
+<aside>Be precise with students: inside a large model the gate is learned, not written by hand, and nobody can read its reasons. The project borrows the idea at the application level, where the gate is plain rules a person can read and every choice is logged with its reason.</aside>
+</section>
+<section id="router" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">In the project · agent/router.py</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Guards first, then the cheapest expert that can do the job</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:260px;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px"><p style="font-size:28px;text-align:center"><b>Buyer note</b><br>personal info hidden</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:56px;height:28px"></x-shape>
+<div style="width:380px;background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;text-align:center"><b>Guards</b></p>
+<p style="font-size:26px;text-align:center;color:#3D4652">AI switched off?<br>Daily budget used?<br>Note empty?</p>
+</div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:56px;height:28px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+<div style="background:#F6E3D3;border:2px solid #9C4A1A;border-radius:12px;padding:18px 24px"><p style="font-size:26px"><b>Jev</b> · sort every note</p></div>
+<div style="background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:18px 24px"><p style="font-size:26px"><b>Claude Haiku</b> · find the numbers</p></div>
+<div style="background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:18px 24px"><p style="font-size:26px"><b>Claude Sonnet</b> · only when Haiku is unsure</p></div>
+<div style="background:#FFFDF8;border:1px solid #B9AF9C;border-radius:12px;padding:18px 24px"><p style="font-size:26px"><b>Claude Sonnet</b> · explain a held import</p></div>
+<div style="background:#DCE8F5;border:2px solid #2A6FB0;border-radius:12px;padding:18px 24px"><p style="font-size:26px"><b>Rules</b> · when any guard is true</p></div>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">The guards protect money and safety before any model is called; the expert list runs from cheapest to most expensive.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 4 / 9</p>
+<aside>Walk a note through: "Container delayed at port, ETA +2 weeks". Guards: the AI is on, budget remains, the note is not empty, so it passes. Jev sorts it as logistics. Claude Haiku pulls out delay_weeks = 2. Haiku is sure, so Sonnet is never called.</aside>
+</section>
+<section id="rules" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">The routing rules</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Each rule names an expert and a reason</h2>
+</div>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:28%">When</th><th style="width:24%">Expert</th><th style="width:48%">Reason written to the log</th></tr>
+<tr><td>AI switched off</td><td>Rules</td><td>kill switch on</td></tr>
+<tr><td>Over the $1 daily budget</td><td>Rules</td><td>daily budget reached</td></tr>
+<tr><td>The note is empty</td><td>Rules</td><td>empty note: nothing for a model to read</td></tr>
+<tr style="background:#F6E3D3"><td>Sort a note</td><td>Jev</td><td>classify questions go to Jev</td></tr>
+<tr><td>Find numbers</td><td>Claude Haiku</td><td>values are extracted by the fast Claude model</td></tr>
+<tr><td>Haiku unsure or failed twice</td><td>Claude Sonnet</td><td>escalated: low confidence</td></tr>
+<tr><td>An import is held</td><td>Claude Sonnet</td><td>a held import needs a plain-English explanation</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">The rules are checked top to bottom; the first that matches wins. Model names live in config.toml, so a newer model is a one-line change.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 5 / 9 · reasons quoted from agent/router.py</p>
+<aside>Ask students to route three cases aloud. An empty note: Rules, because a guard matched. A note during a demo after the budget ran out: Rules. A normal note: Jev to sort, then Claude Haiku to find numbers. Order matters: the guards come first so that no rule further down can spend money once the budget is gone.</aside>
+</section>
+<section id="escalate" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concepts 2 and 3 · escalation and fallback</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Go up for hard cases; go down when a model is missing</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:2px solid #9C4A1A;border-radius:16px;padding:32px">
+<h3 style="font-size:32px;font-weight:600;color:#9C4A1A">Escalation: to a stronger expert</h3>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Everyday:</b> a help desk passes a hard question to a senior engineer.</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Project:</b> Haiku marks its extraction "low confidence", so Sonnet tries again; both calls are logged.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:2px solid #2A6FB0;border-radius:16px;padding:32px">
+<h3 style="font-size:32px;font-weight:600;color:#2A6FB0">Fallback: to a simpler expert</h3>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Everyday:</b> during a phone outage, staff answer from a printed FAQ.</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37"><b>Project:</b> Jev unreachable, so Claude answers the same questions; no Claude key, so keyword rules guess and a person reviews.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">Together they give <b>graceful degradation</b>: the agent keeps working at lower quality instead of stopping, and says so in the log.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 6 / 9</p>
+<aside>Escalation spends more only on the few hard cases. Fallback keeps the pipeline alive during an outage. In both cases a person can see from the log that something unusual happened, and every rules guess on a real note is sent to the review queue.</aside>
+</section>
+<section id="caching" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Concept 4 · caching</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Never pay twice for the same answer</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:8px;width:640px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:160px;font-weight:600;line-height:1;color:#E3A06F">58%</p>
+<p style="font-size:30px;line-height:1.4;color:#CBD5E1">of 1,294 model calls in the reference run were answered from the cache, at $0. The whole run cost <b>$0.12</b>.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:30px;line-height:1.4;color:#F7F5EF">A <b>cache</b> stores each answer under a fingerprint of the question: task, model, prompt version and note.</p>
+<p style="font-size:28px;line-height:1.4;color:#E2E8F0"><b>Everyday:</b> writing a friend's number in your contacts instead of asking every time.</p>
+<p style="font-size:28px;line-height:1.4;color:#E2E8F0"><b>Project:</b> "Fair Trade + organic certified" appears in many imports; Jev is asked once.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Mixture of Experts · 7 / 9 · model_usage_log, reference run 2026-10-13</p>
+<aside>The fingerprint includes the prompt version, so changing a question automatically stops old cached answers being reused. Cost per expert in the reference run: Jev $0.008, Claude Haiku $0.045, Claude Sonnet $0.070. Sonnet ran only 9 times yet cost the most, which shows why the router keeps it for rare cases.</aside>
+</section>
+<section id="logged" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 5 · an accountable router</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Every routing decision leaves a row anyone can read</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">A receptionist's call sheet: time, caller, who the call went to, and why. A complaint can be traced to the right desk.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:30px;line-height:1.4;color:#1F2A37">model_usage_log: one row per call with the expert, task, reason, tokens, time, confidence, cost and outcome.</p>
+</div>
+</div>
+<table style="font-size:26px;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:24%">Expert</th><th style="width:14%">Task</th><th style="width:44%">Reason</th><th style="width:18%">Outcome</th></tr>
+<tr><td>jev</td><td>classify</td><td>classify questions go to Jev</td><td>valid</td></tr>
+<tr><td>claude-haiku-5-5</td><td>extract</td><td>gold set: extraction</td><td>escalated</td></tr>
+<tr><td>rules</td><td>classify</td><td>empty note: nothing for a model to read</td><td>valid</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Mixture of Experts · 8 / 9 · real rows from model_usage_log</p>
+<aside>The dashboard's Models page is built from this table: a timeline of calls by expert, how many tasks went to each expert, and each expert's speed and cost. That page lets students test TypeSafe's claims about Jev's speed with their own data.</aside>
+</section>
+<section id="check" style="background:#1F2A37;color:#F7F5EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E3A06F">Check your understanding</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#F7F5EF">Three questions</h2>
+</div>
+<ol style="font-size:34px;line-height:1.5;color:#E2E8F0;width:1600px">
+<li>How does the project's router differ from the gate inside a large mixture-of-experts model?</li>
+<li>The daily budget runs out at 2 p.m. Where do the afternoon's notes go, and what does a person see?</li>
+<li>Why are the guards checked before the expert rules, not after?</li>
+</ol>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#94A3B8">Mixture of Experts · 9 / 9</p>
+<aside>Answers. 1: the gate inside a model is learned and cannot explain itself; the router is a short list of rules a person wrote, and each choice is logged with its reason. 2: to the keyword rules; a budget incident appears in incident_log, rules guesses go to the review queue, and model_usage_log shows "daily budget reached". 3: so that no rule can call a paid model once the AI is switched off or the budget is spent.</aside>
+</section>
+<div class="notes">
+<h2>Speaker notes</h2>
+<ol style="list-style:none;padding:0">
+<li><b>1. cover</b> — This lecture builds on the Jev lecture. Students should already know the difference between a classifier and a generative model.</li>
+<li><b>2. objectives</b> — Emphasize that plain rules count as an expert. A well-designed system can always fall back to something simple and free.</li>
+<li><b>3. idea</b> — Be precise with students: inside a large model the gate is learned, not written by hand, and nobody can read its reasons. The project borrows the idea at the application level, where the gate is plain rules a person can read and every choice is logged with its reason.</li>
+<li><b>4. router</b> — Walk a note through: &quot;Container delayed at port, ETA +2 weeks&quot;. Guards: the AI is on, budget remains, the note is not empty, so it passes. Jev sorts it as logistics. Claude Haiku pulls out delay_weeks = 2. Haiku is sure, so Sonnet is never called.</li>
+<li><b>5. rules</b> — Ask students to route three cases aloud. An empty note: Rules, because a guard matched. A note during a demo after the budget ran out: Rules. A normal note: Jev to sort, then Claude Haiku to find numbers. Order matters: the guards come first so that no rule further down can spend money once the budget is gone.</li>
+<li><b>6. escalate</b> — Escalation spends more only on the few hard cases. Fallback keeps the pipeline alive during an outage. In both cases a person can see from the log that something unusual happened, and every rules guess on a real note is sent to the review queue.</li>
+<li><b>7. caching</b> — The fingerprint includes the prompt version, so changing a question automatically stops old cached answers being reused. Cost per expert in the reference run: Jev $0.008, Claude Haiku $0.045, Claude Sonnet $0.070. Sonnet ran only 9 times yet cost the most, which shows why the router keeps it for rare cases.</li>
+<li><b>8. logged</b> — The dashboard&#x27;s Models page is built from this table: a timeline of calls by expert, how many tasks went to each expert, and each expert&#x27;s speed and cost. That page lets students test TypeSafe&#x27;s claims about Jev&#x27;s speed with their own data.</li>
+<li><b>9. check</b> — Answers. 1: the gate inside a model is learned and cannot explain itself; the router is a short list of rules a person wrote, and each choice is logged with its reason. 2: to the keyword rules; a budget incident appears in incident_log, rules guesses go to the review queue, and model_usage_log shows &quot;daily budget reached&quot;. 3: so that no rule can call a paid model once the AI is switched off or the budget is spent.</li>
+</ol>
+</div>
+</body>
+</html>

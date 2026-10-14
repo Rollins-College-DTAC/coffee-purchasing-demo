@@ -1,0 +1,31 @@
+<section id="live" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 5 · live refresh</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">The flow chart redraws itself every 5 seconds</h2>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>detect</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>land</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>classify</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#DCEFE3;border:2px solid #2F7A4F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>load</b><br>ok</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#F6E3D3;border:3px solid #B4531F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>decide</b><br>held</p></div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:36px;height:18px"></x-shape>
+<div style="flex:1;background:#F6E3D3;border:3px solid #B4531F;border-radius:12px;padding:18px"><p style="font-size:26px;text-align:center"><b>act</b><br>held</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:28px;line-height:1.4">An airport departures board updates each flight's status by itself; nobody presses refresh.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:28px;line-height:1.4">A <b>fragment</b>, @st.fragment(run_every=5), reruns only the chart, colouring each step from run_log.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Streamlit Dashboards · 7 / 9 · simplified view of the Live run page</p>
+<aside>A fragment is a part of the page that reruns on its own, so the rest of the page, such as a half-typed reviewer name, is not disturbed. Each status is written in words as well as colour, so the chart still reads for colour-blind viewers. The real chart has more steps, drawn in two rows.</aside>
+</section>

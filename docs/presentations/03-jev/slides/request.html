@@ -1,0 +1,20 @@
+<section id="request" style="background:#EDE8DC;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Worked example · one real request</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">One request carries the note and three questions</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:600;color:#9C4A1A">We send</h3>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">state:<br>  buyer_note: "Musty smell on<br>  arrival sample, possible mold"<br>questions:<br>  category:  choice, 6 options<br>  urgency:   score, 4 levels<br>  injection: noul</p>
+</div>
+<x-shape kind="arrow-right" style="background:#6B7280;width:64px;height:32px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:600;color:#2A6FB0">Jev answers</h3>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">category:  quality<br>           confidence 1.00<br>urgency:   3.00  (act today)<br>injection: 0.07  (not an attack)<br><br>860 input tokens · 0.2 s</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#3D4652;width:1600px">Like handing a clerk one form with three boxes to tick: the questions are answered side by side, so asking three costs about the same time as asking one.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Jev · 5 / 10 · a recorded answer from tests/fixtures/jev_recorded.json</p>
+<aside>The state is the material Jev reads: only the note, nothing else, because irrelevant detail lowers accuracy. The questions are written once and reused for every note. A token is a piece of a word; Jev charges per input token, about 4 cents per million.</aside>
+</section>

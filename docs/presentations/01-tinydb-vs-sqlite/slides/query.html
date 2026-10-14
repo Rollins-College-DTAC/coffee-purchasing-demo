@@ -1,0 +1,24 @@
+<section id="query" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Asking questions</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">A query is a question the database answers</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#9C4A1A">TinyDB, in Python</h3>
+<p style="font-size:26px;color:#3D4652">1. Every record from one file</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">raw.search(Query()._file_name<br>  == "coffee_20261013-1511.csv")</p>
+<p style="font-size:26px;color:#3D4652">2. One lot by its ID</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">raw.search(Query().lot_id<br>  == "LOT-0072-08")</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#2A6FB0">SQLite, in SQL</h3>
+<p style="font-size:26px;color:#3D4652">1. Average price of Kenyan lots</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">SELECT AVG(price_per_lb)<br>FROM purchases WHERE origin = 'Kenya';</p>
+<p style="font-size:26px;color:#3D4652">2. How many lots per origin</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;background:#1F2A37;color:#F7F5EF;padding:28px;border-radius:12px">SELECT origin, COUNT(*)<br>FROM purchases GROUP BY origin;</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">TinyDB vs SQLite · 8 / 9</p>
+<aside>TinyDB queries find records; SQL queries can also calculate across them. Read the SQL aloud as English: select the average price per pound from purchases where the origin is Kenya. In the project every SQL query passes through one function, run_sql, which records it in the sql_log table; that is the subject of the logging lecture.</aside>
+</section>

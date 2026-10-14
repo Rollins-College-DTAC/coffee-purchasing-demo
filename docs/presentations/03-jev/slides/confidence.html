@@ -1,0 +1,26 @@
+<section id="confidence" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 3 · confidence</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Confidence says how concentrated the probabilities are</h2>
+</div>
+<div style="display:flex;gap:32px;align-items:center">
+<p style="flex:1;font-size:30px;line-height:1.4;color:#3D4652">All probability on one option gives 1. An even spread gives 0. For a Choice with <i>n</i> options, where <i>p</i> max is the largest probability:</p>
+<p style="flex:1;font-family:'Source Serif 4', Georgia, serif;font-size:44px;text-align:center;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:36px">confidence = (p max − 1/n) ÷ (1 − 1/n)</p>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37">"90% chance of rain" is a confident forecast; "50%" is a shrug.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · sure</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37">"Supplier offered 3% discount…": pricing 1.00 → confidence <b>1.00</b>.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:32px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 3 · unsure</p>
+<p style="font-size:26px;line-height:1.4;color:#1F2A37">"Ignore all previous…": quality 0.55, none 0.45 → (0.55 − 1/6) ÷ (5/6) = <b>0.46</b>.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Jev · 6 / 10</p>
+<aside>Below 0.6, the project sends the record to the review queue for a person. The unsure example is also an injection attempt, which is quarantined anyway. Work the arithmetic on the board: 1/6 is about 0.167; 0.55 minus 0.167 is 0.383; divided by 0.833 gives 0.46.</aside>
+</section>

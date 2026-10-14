@@ -1,0 +1,31 @@
+<section id="forecast" style="background:#F7F5EF;color:#1F2A37;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#9C4A1A">Concept 4 and chart 3 · the prediction interval</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15;color:#1F2A37">Forecasts come with a prediction interval</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="display:flex;flex-direction:column;justify-content:space-between;height:300px;width:110px">
+<p style="font-size:24px;color:#6B7280;text-align:right">$6.50</p>
+<p style="font-size:24px;color:#6B7280;text-align:right">$5.50</p>
+<p style="font-size:24px;color:#6B7280;text-align:right">$4.50</p>
+</div>
+<svg aria-label="Line chart of the last 30 published imports' mean price per pound, then a flat forecast of 5.37 dollars for the next 5 imports with a shaded 95% band from 4.45 to 6.29 dollars" width="1400" height="380" viewBox="0 0 1400 380">
+<g stroke="#DDD6C8" stroke-width="2"><line x1="0" y1="34" x2="1400" y2="34"/><line x1="0" y1="176" x2="1400" y2="176"/><line x1="0" y1="318" x2="1400" y2="318"/></g>
+<polygon points="1220,64 1260,64 1300,63 1340,63 1380,63 1380,326 1340,326 1300,325 1260,325 1220,324" fill="#E3A06F" fill-opacity="0.35"/>
+<polyline points="20,195 60,338 100,219 140,184 180,284 220,173 260,289 300,172 340,151 380,132 420,167 460,106 500,107 540,330 580,223 620,327 660,201 700,323 740,159 780,205 820,278 860,175 900,196 940,250 980,86 1020,76 1060,215 1100,131 1140,163 1180,207" fill="none" stroke="#2A6FB0" stroke-width="4" stroke-linejoin="round"/>
+<polyline points="1180,207 1220,194 1260,194 1300,194 1340,194 1380,194" fill="none" stroke="#B4531F" stroke-width="4" stroke-dasharray="12 8"/>
+</svg>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 1 · everyday</p>
+<p style="font-size:26px;line-height:1.4">"Tomorrow's high: 24 °C, likely between 21 and 27." The range matters as much as the number.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFDF8;border:1px solid #DDD6C8;border-radius:16px;padding:28px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#9C4A1A">Example 2 · the project</p>
+<p style="font-size:26px;line-height:1.4"><span style="color:#2A6FB0"><b>Blue: last 30 imports.</b></span> <span style="color:#B4531F"><b>Orange: forecast $5.37/lb</b></span>, with 95% of imports expected between $4.45 and $6.29.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#6B7280">Displaying Statistical Results · 7 / 11 · exponential smoothing on gold_import_stats, reference run</p>
+<aside>A confidence interval is about an average; a prediction interval is about one future value, so it is much wider. Here the band is wide, $4.45 to $6.29, because each import mixes different origins and its average jumps around. Showing that width is honest: a single line would suggest a precision the data do not support.</aside>
+</section>
